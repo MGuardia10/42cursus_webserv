@@ -79,7 +79,7 @@ re: fclean all
 # Variables to execute the programm. It can be modified to add the parameters
 # that you want to pass to the program.
 EXECUTE_WAY	= ./$(NAME)
-EXECUTE_ARGS=
+EXECUTE_ARGS= 8080 10
 
 # Debugger information
 DEFAULT_SCRUBBER		= valgrind

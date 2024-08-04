@@ -43,6 +43,9 @@ void	Server::initServer( void )
 		close(_socket_fd);
 		throw ServerException("Error binding the socket to the port", strerror(errno));
 	}
+
+	/* Msg */
+	std::cout << "[ " << _name << " ] Opening server." << std::endl;
 }
 
 Server::Server( std::string const& name, int port ) :
@@ -67,6 +70,7 @@ Server::Server( std::string const& name, int port, int backlog ) :
 
 Server::~Server( void )
 {
+	std::cout << "[ " << _name << " ] Closing server." << std::endl;
 	stop();
 	if (_socket_fd > 0)
 		close(_socket_fd);

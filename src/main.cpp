@@ -1,6 +1,10 @@
 #include <iostream>
+#include <cstdlib>
 #include <signal.h>
 #include "Server.hpp"
+
+# define DEFAULT_PORT		8080
+# define DEFAULT_BACKLOG	10
 
 bool	run = true;
 
@@ -8,6 +12,7 @@ void	handle_SIGINT( int sig )
 {
 	(void) sig;
 	run = false;
+	std::cout << std::endl;
 }
 
 bool	handle_signals( void )
@@ -21,9 +26,11 @@ bool	handle_signals( void )
 	return (sigaction(SIGINT, &sa, NULL) != -1);
 }
 
-int main( void )
+int main( int argc, char **argv )
 {
 	Server	*server;
+	int		port;
+	int		backlog;
 
 	/* Assign signals */
 	if (!handle_signals())
@@ -32,10 +39,14 @@ int main( void )
 		return (1);
 	}
 
+	/* Check server options */
+	port = (argc >= 2 ? atol(argv[1]) : DEFAULT_PORT);
+	backlog = (argc >= 3 ? atol(argv[2]) : DEFAULT_BACKLOG);
+
 	/* Init the server */
 	try
 	{
-		server = new Server("Test", 8080, 10);
+		server = new Server("Test", port, backlog);
 		server->start();
 	}
 	catch (std::exception& e)
@@ -59,6 +70,7 @@ int main( void )
 		}
 	}
 
+	/* Delete and close the server */
 	delete server;
 	return (0);
 }
