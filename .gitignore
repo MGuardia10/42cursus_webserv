@@ -1,0 +1,9 @@
+# VSCode folder
+.vscode
+
+# Object files
+*.o
+bin/
+
+# Executable
+webserv
