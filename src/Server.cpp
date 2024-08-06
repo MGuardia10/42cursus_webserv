@@ -7,8 +7,10 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cerrno>
+#include <fstream>
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -125,10 +127,87 @@ bool	Server::stop( void )
 	return (true);
 }
 
+/*============================================================================*/
+
+static std::string	findFile( char const* buffer )
+{
+	int			i = 0;
+	std::string	file = "";
+
+	/* Skip the first word and spaces */
+	while (buffer[i] != ' ')
+		i++;
+	while (buffer[i] == ' ')
+		i++;
+	
+	/* Get the second word */
+	while (buffer[i] != ' ')
+	{
+		file += buffer[i];
+		i++;
+	}
+
+	return (file);
+}
+
+static std::string	readfile( std::string const& path )
+{
+	std::string		buffer;
+	std::string		content = "";
+	std::ifstream	file;
+
+	file.open(path.c_str());
+	if (!file)
+		return ("");
+	
+	while (std::getline(file, buffer))
+		content += buffer;
+
+	file.close();
+	return (content);
+}
+
+static std::string	getFilePath( char const* buffer )
+{
+	struct stat	pathInfo;	
+	std::string	path;
+	int	res;
+
+	/* Get the path */
+	path = "pages" + findFile( buffer );
+
+	/* Check if the path is a folder or a file that exists */
+	res = stat(path.c_str(), &pathInfo);
+	if (res == -1 || (pathInfo.st_mode & S_IFMT) == S_IFDIR || access(path.c_str(), R_OK) == -1)
+		path = "pages/error.html";
+
+	return (path);
+}
+
+static void	sendResponse( int connection, std::string const& content )
+{
+	std::stringstream	ss;
+	std::string response;
+
+	response =
+		"HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n";
+	
+	ss << content.size();
+	response += "Content-Length: " + ss.str() + "\r\n\r\n" + content;
+
+	if (send(connection, response.c_str(), response.size(), 0) == -1)
+	{
+		close(connection);
+		throw Server::ServerException("Error while sending data to a connection", strerror(errno));
+	}
+}
+
 void	Server::acceptConnection( void )
 {
-	int		connection;
-	char	buffer[1025] = {0};
+	int			connection;
+	char		buffer[1025] = {0};
+	std::string	file, fileContent;
 
 	/* Wait for a connection */
 	connection = accept(_socket_fd, NULL, NULL);
@@ -141,28 +220,19 @@ void	Server::acceptConnection( void )
 		close(connection);
 		throw ServerException("Error receiving data from connection", strerror(errno));
 	}
-	std::cout << "============================================" << std::endl;
-	std::cout << "[" << _name << "] New connection" << std::endl;
-	std::cout << "\t- Connection: " << connection << std::endl;
-	std::cout << "\t- Data:" << std::endl << buffer << std::endl;
 
-	/* Send a message */
-	std::string response =
-		"HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html\r\n"
-        "Content-Length: 81\r\n"
-        "\r\n"
-        "<html><head><title>Test</title></head><body><p>Test de webserv!</p></body></html>";
-	char const*	response_c = response.c_str();
-	if (send(connection, response_c, strlen(response_c), 0) == -1)
-	{
-		close(connection);
-		throw ServerException("Error while sending data to a connection", strerror(errno));
-	}
+	/* Search the file of the request */
+	file = getFilePath( buffer );
+
+	/* Read file and send a message */
+	sendResponse( connection, readfile(file) );
 
 	/* Close the connection */
 	close(connection);
 }
+
+/*============================================================================*/
+
 
 std::string	Server::print( void ) const
 {
