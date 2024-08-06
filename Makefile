@@ -83,7 +83,7 @@ EXECUTE_ARGS= 8080 10
 
 # Debugger information
 DEFAULT_SCRUBBER		= valgrind
-DEFAULT_SCRUBBER_FLAGS	= --leak-check=full --track-fds=yes
+DEFAULT_SCRUBBER_FLAGS	= -s --leak-check=full --show-leak-kinds=all --track-fds=yes
 
 
 # Rule to clean the terminal

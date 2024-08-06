@@ -135,13 +135,13 @@ static std::string	findFile( char const* buffer )
 	std::string	file = "";
 
 	/* Skip the first word and spaces */
-	while (buffer[i] != ' ')
+	while (buffer[i] && buffer[i] != ' ')
 		i++;
-	while (buffer[i] == ' ')
+	while (buffer[i] && buffer[i] == ' ')
 		i++;
 	
 	/* Get the second word */
-	while (buffer[i] != ' ')
+	while (buffer[i] && buffer[i] != ' ')
 	{
 		file += buffer[i];
 		i++;
@@ -167,6 +167,7 @@ static std::string	readfile( std::string const& path )
 	return (content);
 }
 
+/* DEBUGGING: Print msg to know the request pages and the return ones */
 static std::string	getFilePath( char const* buffer )
 {
 	struct stat	pathInfo;	
@@ -175,11 +176,13 @@ static std::string	getFilePath( char const* buffer )
 
 	/* Get the path */
 	path = "pages" + findFile( buffer );
+	std::cout << "{[" << path << "] => ";
 
 	/* Check if the path is a folder or a file that exists */
 	res = stat(path.c_str(), &pathInfo);
 	if (res == -1 || (pathInfo.st_mode & S_IFMT) == S_IFDIR || access(path.c_str(), R_OK) == -1)
 		path = "pages/error.html";
+	std::cout << "[" << path << "]}" << std::endl;
 
 	return (path);
 }
@@ -232,7 +235,6 @@ void	Server::acceptConnection( void )
 }
 
 /*============================================================================*/
-
 
 std::string	Server::print( void ) const
 {
