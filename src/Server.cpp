@@ -181,7 +181,7 @@ static std::string	getFilePath( char const* buffer )
 	/* Check if the path is a folder or a file that exists */
 	res = stat(path.c_str(), &pathInfo);
 	if (res == -1 || (pathInfo.st_mode & S_IFMT) == S_IFDIR || access(path.c_str(), R_OK) == -1)
-		path = "pages/error.html";
+		path = "pages/404.html";
 	std::cout << "[" << path << "]}" << std::endl;
 
 	return (path);
