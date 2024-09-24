@@ -14,9 +14,8 @@ CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -fdiagnostics-color=always
 VPATH=src/:
 OBJ_FOLDER=obj
 
-HEADERS=	Server.hpp
-SRC=		main.cpp	\
-			Server.cpp
+HEADERS=
+SRC=		main.cpp
 OBJ=$(SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 #####################################################################################################################
 
