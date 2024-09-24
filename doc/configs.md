@@ -269,15 +269,15 @@ Ir documentando aquí las directivas que hagamos nuestras para luego hacer docum
 
 
 ## <b id="5.0">TOKENS TABLE</b>
-|Tokens|Server|Location|
-|-|-|-|
-|listen|✔||
-|server_name|✔||
-|error_page|✔|✔|
-|client_max_body_size|✔|✔|
-|return|✔|✔|
-|alias||✔|
-|root|✔|✔|
-|index|✔|✔|
-|autoindex|✔|✔|
-|cgi_pass|✔|✔|
+|Tokens|Server|Location|Added 2 class|
+|-|-|-|-|
+|listen|✔||✔ (port)|
+|server_name|✔||✔|
+|error_page|✔|✔|✔|
+|client_max_body_size|✔|✔|✔|
+|return|✔|✔|❔|
+|alias||✔|✔|
+|root|✔|✔|✔|
+|index|✔|✔|✔|
+|autoindex|✔|✔|✔|
+|cgi_pass|✔|✔|✔|
