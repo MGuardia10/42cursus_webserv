@@ -11,12 +11,26 @@ COLOR_RESET		= \e[0m
 CXX			:= c++
 CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -fdiagnostics-color=always
 #####################################################################################################################
-VPATH=src/:
+# Paths to find the files
+VPATH =	include/:		\
+		src/:			\
+		src/Server/:
 OBJ_FOLDER=obj
 
-HEADERS=
-SRC=		main.cpp
-OBJ=$(SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+# Headers
+HEADERS=	ConfigBase.hpp	\
+			Location.hpp	\
+			Server.hpp
+
+# Source files
+MAIN_SRC =	main.cpp
+OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
+SERVER_SRC =	ConfigBase.cpp	\
+				Location.cpp	\
+				Server.cpp
+OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
 #####################################################################################################################
 
 all: $(NAME)
@@ -42,13 +56,12 @@ $(OBJ_FOLDER)/%.o: %.cpp $(HEADERS)
 		echo "$(COLOR_BLUE)[ C++ ] Compiling c++ files ($(COLOR_CYAN)$(CXXFLAGS)$(COLOR_BLUE))$(COLOR_RESET)";		\
 	fi
 
-
 	@echo -n "\t$(COLOR_CYAN)[......]  Compiling $<...$(COLOR_RESET)"
 	@RES=$$($(CXX) $(CXXFLAGS) -c $< -o $@ 2> $(OBJ_FOLDER)/.error; echo $$?);	\
 	if [ $$RES -ne 0 ]; then													\
 		echo "\r\t$(COLOR_RED)[ ERROR ]$(COLOR_RESET)";							\
 		tail -n +1 $(OBJ_FOLDER)/.error;										\
-		make -s CLEAN_EXTENSION													\
+		make -s CLEAN_EXTENSION;												\
 		exit $$RES;																\
 	fi
 
