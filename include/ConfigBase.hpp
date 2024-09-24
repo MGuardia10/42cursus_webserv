@@ -7,6 +7,9 @@
 class ConfigBase
 {
 	private:
+		/* Route of the location */
+		std::string	route;
+
 		/* Error pages: <status_code, page_path> */
 		std::map<int, std::string>	error_pages;
 
