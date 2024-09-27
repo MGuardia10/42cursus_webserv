@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include "default.hpp"
 
 class ConfigBase
 {
@@ -13,9 +14,6 @@ class ConfigBase
 		};
 
 	private:
-		/* Route of the location */
-		std::string	_route;
-
 		/* Error pages: <status_code, page_path> */
 		std::map<int, std::string>	_error_pages;
 

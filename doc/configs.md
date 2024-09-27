@@ -269,15 +269,15 @@ Ir documentando aquí las directivas que hagamos nuestras para luego hacer docum
 
 
 ## <b id="5.0">TOKENS TABLE</b>
-|Tokens|Server|Location|Added 2 class|Default|
-|-|-|-|-|-|
-|listen|✔||✔ (port)|-|
-|server_name|✔||✔|"Server X"|
-|error_page|✔|✔|✔|<40x and 50x> -> pages/error|
-|client_max_body_size|✔|✔|✔|100b|
-|return|✔|✔|❔||
-|alias||✔|✔|""|
-|root|✔|✔|✔|"pages/"|
-|index|✔|✔|✔|"" (-> error)|
-|autoindex|✔|✔|✔|false|
-|cgi_pass|✔|✔|✔|\<empty\>|
+|Tokens|Server|Location|Added 2 both class|Default|Implemented|
+|-|-|-|-|-|-|
+|listen|✔||✔ (port)|[NP] -1|[X]|
+|server_name|✔||✔|[P] "Server X"|[X]|
+|error_page|✔|✔|✔|[P] <40x and 50x> -> pages/error|[ ]|
+|client_max_body_size|✔|✔|✔|[P] 100b|[X]|
+|return|✔|✔|✔|[NP] {-1, ""}|[ ]|
+|alias||✔|✔|[P] ""|[X]|
+|root|✔|✔|✔|[P] "pages/"|[X]|
+|index|✔|✔|✔|[NP] <empty> (-> error)|[X]|
+|autoindex|✔|✔|✔|[P] false|[X]|
+|cgi_pass|✔|✔|✔|[NP] \<empty\>|[X]|

@@ -4,10 +4,10 @@
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
 
-Location::Location( void ) : ConfigBase()
-{
-	/* TODO */
-}
+Location::Location( void ) : ConfigBase(),
+	_route(""),
+	_alias(ALIAS_DEFAULT)
+{}
 
 Location::Location( Location const& other ) : ConfigBase( other )
 {

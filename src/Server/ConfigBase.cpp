@@ -4,9 +4,13 @@
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
 
-ConfigBase::ConfigBase( void )
+ConfigBase::ConfigBase( void ) :
+	_client_max_body_size(CLIENT_MAX_BODY_SIZE_DEFAULT),
+	_root(ROOT_DEFAULT),
+	_autoindex(AUTOINDEX_DEFAULT)
 {
-	/* TODO */
+	_indexes.clear();
+	_cgi.clear();
 }
 
 ConfigBase::ConfigBase( ConfigBase const& other )

@@ -16,8 +16,5 @@
 /* Default folder where the pages will be searched */
 # define ROOT_DEFAULT					"pages/"
 
-/* Default index -> None */
-# define INDEX_DEFAULT					""
-
 /* Default autoindex (the folders won't saw their files) */
 # define AUTOINDEX_DEFAULT				false

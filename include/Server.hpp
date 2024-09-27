@@ -4,12 +4,16 @@
 #include <vector>
 #include "ConfigBase.hpp"
 #include "Location.hpp"
+#include "default.hpp"
 
 class Server : public ConfigBase
 {
 	private:
 		/* Number of servers created */
 		static int	servers_count;
+
+		/* Flag to know if the server is running */
+		bool	_is_running;
 
 		/* Port where the server will be listening */
 		int	_port;

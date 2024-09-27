@@ -2,10 +2,15 @@
 
 #include <iostream>
 #include "ConfigBase.hpp"
+#include "default.hpp"
 
 class Location : public ConfigBase
 {
 	private:
+		/* Route of the location */
+		std::string	_route;
+
+		/* Alias of the route */
 		std::string	_alias;
 
 	public:
