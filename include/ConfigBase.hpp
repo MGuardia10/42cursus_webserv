@@ -6,6 +6,12 @@
 
 class ConfigBase
 {
+	public:
+		struct ReturnData {
+			int			code;
+			std::string	text;
+		};
+
 	private:
 		/* Route of the location */
 		std::string	route;
@@ -28,9 +34,11 @@ class ConfigBase
 		/* List of possible cgis */
 		std::vector< std::map<std::string, std::string> >	cgi;
 
-		/* TODO: return field */
+		/* Return field */
+		ReturnData	returnData;
 
 	public:
+
 
 		/* NOTE: Constructors and destructor */
 		ConfigBase( void );
