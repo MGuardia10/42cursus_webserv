@@ -8,6 +8,9 @@
 class Server : public ConfigBase
 {
 	private:
+		/* Number of servers created */
+		static int	servers_count;
+
 		/* Port where the server will be listening */
 		int	_port;
 

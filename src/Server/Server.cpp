@@ -4,6 +4,8 @@
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
 
+int Server::servers_count = 0;
+
 Server::Server( void ) : ConfigBase()
 {
 	/* TODO */
