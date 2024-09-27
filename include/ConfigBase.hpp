@@ -14,28 +14,28 @@ class ConfigBase
 
 	private:
 		/* Route of the location */
-		std::string	route;
+		std::string	_route;
 
 		/* Error pages: <status_code, page_path> */
-		std::map<int, std::string>	error_pages;
+		std::map<int, std::string>	_error_pages;
 
 		/* Client max request size (vutes/characters) */
-		size_t	client_max_body_size;
+		size_t	_client_max_body_size;
 
 		/* Root folder, where the files will be search */
-		std::string	root;
+		std::string	_root;
 
 		/* Index files */
-		std::vector<std::string>	indexes;
+		std::vector<std::string>	_indexes;
 
 		/* Autoindex (list the files on a folder) */
-		bool	autoindex;
+		bool	_autoindex;
 
 		/* List of possible cgis */
-		std::vector< std::map<std::string, std::string> >	cgi;
+		std::vector< std::map<std::string, std::string> >	_cgi;
 
 		/* Return field */
-		ReturnData	returnData;
+		ReturnData	_returnData;
 
 	public:
 

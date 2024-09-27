@@ -6,7 +6,7 @@
 class Location : public ConfigBase
 {
 	private:
-		std::string	alias;
+		std::string	_alias;
 
 	public:
 

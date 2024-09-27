@@ -9,13 +9,13 @@ class Server : public ConfigBase
 {
 	private:
 		/* Port where the server will be listening */
-		int	port;
+		int	_port;
 
 		/* Name of the server */
-		std::string	server_name;
+		std::string	_server_name;
 
 		/* List of the server locations */
-		std::vector<Location>	locations;
+		std::vector<Location>	_locations;
 
 	public:
 
