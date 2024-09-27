@@ -7,9 +7,6 @@
 /* TODO: check the nginx value */
 # define CLIENT_MAX_BODY_SIZE_DEFAULT	100
 
-/* TODO: Default return */
-# define RETURN_DEFAULT	NULL
-
 /* Default alias -> None */
 # define ALIAS_DEFAULT					""
 

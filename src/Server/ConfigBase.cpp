@@ -9,8 +9,13 @@ ConfigBase::ConfigBase( void ) :
 	_root(ROOT_DEFAULT),
 	_autoindex(AUTOINDEX_DEFAULT)
 {
+	/* Empty the vectors */
 	_indexes.clear();
 	_cgi.clear();
+
+	/* Init the return struct */
+	_returnData.code = -1;
+	_returnData.text = "";
 }
 
 ConfigBase::ConfigBase( ConfigBase const& other )

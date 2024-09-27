@@ -7,9 +7,9 @@
 int Server::servers_count = 0;
 
 Server::Server( void ) : ConfigBase(),
+	_is_running(false),
 	_port(-1),
-	_server_name("Server " + ++Server::servers_count),
-	_is_running(false)
+	_server_name("Server " + ++Server::servers_count)
 {
 	_locations.clear();
 }

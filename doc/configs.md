@@ -275,7 +275,7 @@ Ir documentando aquí las directivas que hagamos nuestras para luego hacer docum
 |server_name|✔||✔|[P] "Server X"|[X]|
 |error_page|✔|✔|✔|[P] <40x and 50x> -> pages/error|[ ]|
 |client_max_body_size|✔|✔|✔|[P] 100b|[X]|
-|return|✔|✔|✔|[NP] {-1, ""}|[ ]|
+|return|✔|✔|✔|[P] {-1, ""}|[X]|
 |alias||✔|✔|[P] ""|[X]|
 |root|✔|✔|✔|[P] "pages/"|[X]|
 |index|✔|✔|✔|[NP] <empty> (-> error)|[X]|
