@@ -17,12 +17,9 @@ class Location : public ConfigBase
 
 		/* NOTE: Constructors and destructor */
 		Location( void );
-		Location( Location const& other );
 		~Location( void );
 
 		/* NOTE: Member operators overloading */
-		/* Comparator operators */
-		Location&	operator=( const Location &data );
 
 		/* NOTE: Getters and setters */
 

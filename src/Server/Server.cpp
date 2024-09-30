@@ -21,12 +21,6 @@ Server::Server( void ) : ConfigBase(),
 	_locations.clear();
 }
 
-Server::Server( Server const& other ) : ConfigBase( other )
-{
-	/* TODO */
-	(void)other;
-}
-
 Server::~Server( void )
 {
 	/* TODO */
@@ -37,18 +31,6 @@ Server::~Server( void )
 /*============================================================================*/
 /* SECTION:                   Operator overloading                            */
 /*============================================================================*/
-
-/**********************************/
-/* NOTE: Copy assignment operator */
-/**********************************/
-Server&	Server::operator=( Server const& other )
-{
-	if (this != &other)
-	{
-		/* TODO */
-	}
-	return (*this);
-}
 
 /***********************/
 /* NOTE: '<<' operator */

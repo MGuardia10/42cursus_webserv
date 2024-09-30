@@ -29,12 +29,9 @@ class Server : public ConfigBase
 
 		/* NOTE: Constructors and destructor */
 		Server( void );
-		Server( Server const& other );
 		~Server( void );
 
 		/* NOTE: Member operators overloading */
-		/* Comparator operators */
-		Server&	operator=( const Server &data );
 
 		/* NOTE: Getters and setters */
 

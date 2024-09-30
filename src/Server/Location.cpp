@@ -9,12 +9,6 @@ Location::Location( void ) : ConfigBase(),
 	_alias(ALIAS_DEFAULT)
 {}
 
-Location::Location( Location const& other ) : ConfigBase( other )
-{
-	/* TODO */
-	(void)other;
-}
-
 Location::~Location( void )
 {
 	/* TODO */
@@ -25,18 +19,6 @@ Location::~Location( void )
 /*============================================================================*/
 /* SECTION:                   Operator overloading                            */
 /*============================================================================*/
-
-/**********************************/
-/* NOTE: Copy assignment operator */
-/**********************************/
-Location&	Location::operator=( Location const& other )
-{
-	if (this != &other)
-	{
-		/* TODO */
-	}
-	return (*this);
-}
 
 /***********************/
 /* NOTE: '<<' operator */

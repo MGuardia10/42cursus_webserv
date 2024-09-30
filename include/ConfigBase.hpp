@@ -35,17 +35,15 @@ class ConfigBase
 		/* Return field */
 		ReturnData	_returnData;
 
+		/* NOTE: Constructors and destructor */
+		ConfigBase( void );
+		virtual ~ConfigBase( void );
+
 	public:
 
 
-		/* NOTE: Constructors and destructor */
-		ConfigBase( void );
-		ConfigBase( ConfigBase const& other );
-		~ConfigBase( void );
 
 		/* NOTE: Member operators overloading */
-		/* Comparator operators */
-		ConfigBase&	operator=( const ConfigBase &data );
 
 		/* NOTE: Getters and setters */
 

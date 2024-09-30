@@ -18,12 +18,6 @@ ConfigBase::ConfigBase( void ) :
 	_returnData.text = "";
 }
 
-ConfigBase::ConfigBase( ConfigBase const& other )
-{
-	/* TODO */
-	(void) other;
-}
-
 ConfigBase::~ConfigBase( void )
 {
 	/* TODO */
@@ -34,18 +28,6 @@ ConfigBase::~ConfigBase( void )
 /*============================================================================*/
 /* SECTION:                   Operator overloading                            */
 /*============================================================================*/
-
-/**********************************/
-/* NOTE: Copy assignment operator */
-/**********************************/
-ConfigBase&	ConfigBase::operator=( ConfigBase const& other )
-{
-	if (this != &other)
-	{
-		/* TODO */
-	}
-	return (*this);
-}
 
 /***********************/
 /* NOTE: '<<' operator */
