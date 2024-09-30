@@ -13,7 +13,7 @@ class ConfigBase
 			std::string	text;
 		};
 
-	private:
+	protected:
 		/* Error pages: <status_code, page_path> */
 		std::map<int, std::string>	_error_pages;
 
