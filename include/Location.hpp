@@ -22,6 +22,12 @@ class Location : public ConfigBase
 		/* NOTE: Member operators overloading */
 
 		/* NOTE: Getters and setters */
+		std::string	get_route( void ) const;
+		void		set_route( std::string route );
+
+		std::string	get_alias( void );
+		void		set_alias( std::string alias );
+
 
 		/* NOTE: Objects features */
 
