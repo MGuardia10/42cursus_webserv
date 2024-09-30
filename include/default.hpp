@@ -15,3 +15,6 @@
 
 /* Default autoindex (the folders won't saw their files) */
 # define AUTOINDEX_DEFAULT				false
+
+/* Default server IP */
+# define IP_DEFAULT	""

@@ -16,7 +16,8 @@ class Server : public ConfigBase
 		bool	_is_running;
 
 		/* Port where the server will be listening */
-		int	_port;
+		std::string	_ip;
+		int			_port;
 
 		/* Name of the server */
 		std::string	_server_name;
