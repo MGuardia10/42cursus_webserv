@@ -71,7 +71,7 @@ class ConfigBase
 		void								add_cgi( std::string extension, std::string path );
 
 		/* Return */
-		ReturnData const*	get_return( void ) const;
+		ReturnData const&	get_return( void ) const;
 		void	set_return( ReturnData data );
 
 		/* NOTE: Objects features */

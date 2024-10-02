@@ -107,7 +107,7 @@ void								ConfigBase::add_cgi( std::string extension, std::string path )
 /****************/
 /* NOTE: Return */
 /****************/
-ConfigBase::ReturnData const*	ConfigBase::get_return( void ) const { return &(_return_data); }
+ConfigBase::ReturnData const&	ConfigBase::get_return( void ) const { return _return_data; }
 void							ConfigBase::set_return( ReturnData data )
 {
 	_return_data.code = data.code;
