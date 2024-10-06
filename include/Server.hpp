@@ -23,7 +23,7 @@ class Server : public ConfigBase
 		std::string	_server_name;
 
 		/* List of the server locations */
-		std::vector<Location>	_locations;
+		std::map<std::string, Location>	_locations;
 
 	public:
 
@@ -34,6 +34,20 @@ class Server : public ConfigBase
 		/* NOTE: Member operators overloading */
 
 		/* NOTE: Getters and setters */
+		int	is_running( void ) const;
+		
+		std::string	get_ip( void ) const;
+		void		set_ip( std::string ip );
+
+		int			get_port( void ) const;
+		void		set_port( int port );
+
+		std::string	get_server_name( void ) const;
+		void		set_server_name( std::string server_name );
+
+		std::map<std::string, Location>	get_locations( void ) const;
+		Location const*					get_location( std::string name ) const;
+		void							add_location( std::string name, Location location );
 
 		/* NOTE: Objects features */
 

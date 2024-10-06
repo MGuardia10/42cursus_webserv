@@ -273,7 +273,7 @@ Ir documentando aquí las directivas que hagamos nuestras para luego hacer docum
 |-|-|-|-|-|-|
 |listen|✔||✔ (port)|[NP] -1|[X]|
 |server_name|✔||✔|[P] "Server X"|[X]|
-|error_page|✔|✔|✔|[P] <40x and 50x> -> pages/error|[ ]|
+|error_page|✔|✔|✔|[P] <40x and 50x> -> pages/error|[X]|
 |client_max_body_size|✔|✔|✔|[P] 100b|[X]|
 |return|✔|✔|✔|[P] {-1, ""}|[X]|
 |alias||✔|✔|[P] ""|[X]|
