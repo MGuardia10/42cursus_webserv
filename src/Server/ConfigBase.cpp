@@ -1,5 +1,6 @@
 #include "../../include/ConfigBase.hpp"
 #include <algorithm>
+#include <sstream>
 
 /*============================================================================*/
 /* SECTION:               Constructors and destructor                         */
@@ -33,10 +34,52 @@ ConfigBase::~ConfigBase( void )
 /***********************/
 /* NOTE: '<<' operator */
 /***********************/
+
+std::string	ConfigBase::print(void) const
+{
+	std::stringstream	ss;
+	std::string	buffer = "";
+
+	/* Root */
+	buffer = "\t- Root: " + _root + "\n";
+
+	/* Client max body */
+	ss << _client_max_body_size;
+	buffer += "\t- Client max body: " + ss.str() + "\n";
+	
+	/* Autoindex */
+	buffer += "\t- Autoindex: " + (_autoindex == true ? std::string("true") : std::string("false"));
+
+	/* Index */
+	buffer += "\t- Index:\n";
+	for (std::vector<std::string>::const_iterator it; it != _indexes.end(); it++)
+		buffer += "\t\t· \"" + *it + "\"\n";
+
+	/* Error_pages */
+	buffer += "\t- Error pages:\n";
+	for (std::map<int, std::string>::const_iterator it; it != _error_pages.end(); it++)
+	{
+		ss.clear();
+		ss << it->first;
+		buffer += "\t\t· " + ss.str() + ": \"" + it->second + "\"";
+	}
+
+	/* Return data */
+	ss.clear();
+	ss << _return_data.code;
+	buffer += "\t- Return data:\n\t\t· " + ss.str() + "\n\t\t· Text: " + _return_data.text + "\n";
+
+	/* CGIs*/
+	buffer += "\t- CGI:\n";
+	for (std::map<std::string, std::string>::const_iterator it; it != _cgi.end(); it++)
+		buffer += "\t\t· " + it->first + ": \"" + it->second + "\"";
+
+	return buffer;
+}
+
 std::ostream&	operator<<( std::ostream& os, ConfigBase const& printObject )
 {
-	/* TODO */
-	(void) printObject;
+	printObject.print();
 	return (os);
 };
 
