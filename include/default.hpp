@@ -17,4 +17,4 @@
 # define AUTOINDEX_DEFAULT				false
 
 /* Default server IP */
-# define IP_DEFAULT	""
+# define IP_DEFAULT	"127.0.0.1"
