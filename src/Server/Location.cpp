@@ -33,18 +33,15 @@ std::string		Location::print( void ) const
 {
 	std::string	buffer = "";
 
-	buffer += "[ LOCATION ] " + _route;
-	buffer += "\t- Alias: \"" + _alias + "\"";
+	buffer += "[ LOCATION ] " + _route + "\n";
+	buffer += "\t· Alias: \"" + _alias + "\"\n";
+	buffer += static_cast<ConfigBase const&>(*this).print();
 	return buffer;
 }
 
 std::ostream&	operator<<( std::ostream& os, Location const& printObject )
 {
-	std::string	buffer;
-
-	buffer = printObject.print();
-	buffer += static_cast<ConfigBase const&>(printObject).print();
-	os << buffer;
+	os << printObject.print();
 	return (os);
 };
 
