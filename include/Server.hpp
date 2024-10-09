@@ -50,6 +50,7 @@ class Server : public ConfigBase
 		void							add_location( std::string name, Location location );
 
 		/* NOTE: Objects features */
+		std::string	print( void ) const;
 
 		/* NOTE: Exceptions */
 

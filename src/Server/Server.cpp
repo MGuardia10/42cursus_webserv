@@ -35,10 +35,29 @@ Server::~Server( void )
 /***********************/
 /* NOTE: '<<' operator */
 /***********************/
+
+std::string	Server::print( void ) const
+{
+	std::stringstream	ss;
+	std::string			buffer = "";
+
+	buffer += "[ SERVER ] " + _server_name;
+
+	buffer += "\t· Is running: " + (_is_running ? std::string("true") : std::string("false"));
+
+	ss << _port;
+	buffer += "\t· Connection: " + _ip + ":" + ss.str() + "\n";
+
+	buffer += "\t· Locations:\n";
+	for (std::map<std::string, Location>::const_iterator it = _locations.begin(); it != _locations.end(); it++)
+		buffer += it->second.print() + "\n";
+
+	return buffer;
+}
+
 std::ostream&	operator<<( std::ostream& os, Server const& printObject )
 {
-	/* TODO */
-	(void) printObject;
+	os << printObject.print();
 	return (os);
 };
 
