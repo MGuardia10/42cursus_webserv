@@ -9,6 +9,11 @@ Location::Location( void ) : ConfigBase(),
 	_alias(ALIAS_DEFAULT)
 {}
 
+Location::Location( std::string const& route ) : ConfigBase(),
+	_route(route),
+	_alias(ALIAS_DEFAULT)
+{}
+
 Location::~Location( void )
 {
 	/* TODO */
@@ -23,10 +28,23 @@ Location::~Location( void )
 /***********************/
 /* NOTE: '<<' operator */
 /***********************/
+
+std::string		Location::print( void ) const
+{
+	std::string	buffer = "";
+
+	buffer += "[ LOCATION ] " + _route;
+	buffer += "\t- Alias: \"" + _alias + "\"";
+	return buffer;
+}
+
 std::ostream&	operator<<( std::ostream& os, Location const& printObject )
 {
-	/* TODO */
-	(void)printObject;
+	std::string	buffer;
+
+	buffer = printObject.print();
+	buffer += static_cast<ConfigBase const&>(printObject).print();
+	os << buffer;
 	return (os);
 };
 

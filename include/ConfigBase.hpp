@@ -75,7 +75,7 @@ class ConfigBase
 		void	set_return( ReturnData data );
 
 		/* NOTE: Objects features */
-		std::string	print() const;
+		std::string	print( void ) const;
 
 		/* NOTE: Exceptions */
 

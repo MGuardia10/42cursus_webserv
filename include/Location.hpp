@@ -17,6 +17,7 @@ class Location : public ConfigBase
 
 		/* NOTE: Constructors and destructor */
 		Location( void );
+		Location( std::string const& route );
 		~Location( void );
 
 		/* NOTE: Member operators overloading */
@@ -30,6 +31,7 @@ class Location : public ConfigBase
 
 
 		/* NOTE: Objects features */
+		std::string	print( void ) const;
 
 		/* NOTE: Exceptions */
 

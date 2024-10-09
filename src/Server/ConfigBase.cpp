@@ -79,7 +79,7 @@ std::string	ConfigBase::print(void) const
 
 std::ostream&	operator<<( std::ostream& os, ConfigBase const& printObject )
 {
-	printObject.print();
+	os << printObject.print();
 	return (os);
 };
 
