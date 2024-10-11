@@ -14,6 +14,7 @@ CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -fdiagnostics-color=always
 # Paths to find the files
 VPATH =	include/:		\
 		src/:			\
+		src/Main/:		\
 		src/Server/:
 OBJ_FOLDER=obj
 
@@ -23,7 +24,8 @@ HEADERS=	ConfigBase.hpp	\
 			Server.hpp
 
 # Source files
-MAIN_SRC =	main.cpp
+MAIN_SRC =	main.cpp		\
+			signals.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 SERVER_SRC =	ConfigBase.cpp	\
