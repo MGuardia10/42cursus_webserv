@@ -23,7 +23,9 @@ Server::Server( void ) : ConfigBase(),
 
 Server::~Server( void )
 {
-	/* TODO */
+	if (_is_running)
+		this->stop();
+	_locations.clear();
 }
 
 /*==========*/
@@ -101,6 +103,24 @@ void	Server::add_location( std::string name, Location location )
 /*============================================================================*/
 /* SECTION:                      Object features                              */
 /*============================================================================*/
+
+void	Server::run( void )
+{
+	if (_is_running)
+		return ;
+	_is_running = true;
+
+	/* TODO: Implementation of the function */
+}
+
+void	Server::stop( void )
+{
+	if (!_is_running)
+		return ;
+	_is_running = false;
+
+	/* TODO: Implementation of the function */
+}
 
 /*==========*/
 /* !SECTION */

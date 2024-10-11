@@ -52,6 +52,9 @@ class Server : public ConfigBase
 		/* NOTE: Objects features */
 		std::string	print( void ) const;
 
+		void	run( void );
+		void	stop( void);
+
 		/* NOTE: Exceptions */
 
 };
