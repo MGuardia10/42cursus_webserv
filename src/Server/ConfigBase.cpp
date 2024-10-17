@@ -59,13 +59,13 @@ std::string	ConfigBase::print(void) const
 	buffer += "\t- Error pages:\n";
 	for (std::map<int, std::string>::const_iterator it; it != _error_pages.end(); it++)
 	{
-		ss.clear();
+		ss.str("");
 		ss << it->first;
 		buffer += "\t\t· " + ss.str() + ": \"" + it->second + "\"";
 	}
 
 	/* Return data */
-	ss.clear();
+	ss.str("");
 	ss << _return_data.code;
 	buffer += "\t- Return data:\n\t\t· " + ss.str() + "\n\t\t· Text: " + _return_data.text + "\n";
 
