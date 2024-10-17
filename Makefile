@@ -15,18 +15,22 @@ CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -fdiagnostics-color=always
 VPATH =	include/:		\
 		src/:			\
 		src/Main/:		\
+		src/Parse:		\
 		src/Server/:
 OBJ_FOLDER=obj
 
-# Headers
+# NOTE: Headers
 HEADERS=	ConfigBase.hpp	\
 			Location.hpp	\
 			Server.hpp
 
-# Source files
+# NOTE: Source files
 MAIN_SRC =	main.cpp		\
 			signals.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
+PARSE_SRC =	parse.cpp
+OBJ += $(PARSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 SERVER_SRC =	ConfigBase.cpp	\
 				Location.cpp	\

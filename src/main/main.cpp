@@ -17,6 +17,11 @@ int main(int argc, char *argv[])
 
 	/* Assign the necessary signals (SIGINT) */
 	assign_signals();
-	
+
+	/* TODO: Parse -> get the servers vector */
+	/* TODO: If the vectors are valid, run them */
+	/* TODO: Loop (until SIGINT) to detect the servers connections */
+	/* TODO: Stop the servers amd free the ports */
+
 	return (0);
 }
