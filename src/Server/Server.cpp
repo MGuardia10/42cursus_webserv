@@ -43,14 +43,14 @@ std::string	Server::print( void ) const
 	std::stringstream	ss;
 	std::string			buffer = "";
 
-	buffer += "[ SERVER ] " + _server_name;
+	buffer += "[ SERVER ] " + _server_name + "\n";
 
-	buffer += "\t· Is running: " + (_is_running ? std::string("true") : std::string("false"));
+	buffer += "\t· Is running: " + (_is_running ? std::string("true") : std::string("false")) + "\n";
 
 	ss << _port;
 	buffer += "\t· Connection: " + _ip + ":" + ss.str() + "\n";
 
-	buffer += "\t· Locations:\n";
+	buffer += "\t· Locations:\n\n";
 	for (std::map<std::string, Location>::const_iterator it = _locations.begin(); it != _locations.end(); it++)
 		buffer += it->second.print() + "\n";
 

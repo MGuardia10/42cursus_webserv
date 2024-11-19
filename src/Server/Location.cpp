@@ -33,9 +33,9 @@ std::string		Location::print( void ) const
 {
 	std::string	buffer = "";
 
-	buffer += "[ LOCATION ] " + _route + "\n";
-	buffer += "\t· Alias: \"" + _alias + "\"\n";
-	buffer += static_cast<ConfigBase const&>(*this).print();
+	buffer += "\t[ LOCATION ] " + _route + "\n";
+	buffer += "\t\t· Alias: \"" + _alias + "\"\n";
+	buffer += static_cast<ConfigBase const&>(*this).print("\t");
 	return buffer;
 }
 

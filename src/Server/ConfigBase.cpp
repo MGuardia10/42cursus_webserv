@@ -14,6 +14,7 @@ ConfigBase::ConfigBase( void ) :
 	/* Empty the vectors */
 	_indexes.clear();
 	_cgi.clear();
+	_error_pages.clear();
 
 	/* Init the return struct */
 	_return_data.code = -1;
@@ -35,44 +36,56 @@ ConfigBase::~ConfigBase( void )
 /* NOTE: '<<' operator */
 /***********************/
 
-std::string	ConfigBase::print(void) const
+std::string	ConfigBase::print( void ) const { return this->print(""); }
+std::string	ConfigBase::print( std::string preline ) const
 {
 	std::stringstream	ss;
 	std::string	buffer = "";
 
 	/* Root */
-	buffer = "\t- Root: " + _root + "\n";
+	buffer = "\t" + preline + "- Root: \"" + _root + "\"\n";
 
 	/* Client max body */
 	ss << _client_max_body_size;
-	buffer += "\t- Client max body: " + ss.str() + "\n";
+	buffer += "\t" + preline + "- Client max body: " + ss.str() + "\n";
 	
 	/* Autoindex */
-	buffer += "\t- Autoindex: " + (_autoindex == true ? std::string("true") : std::string("false"));
+	buffer += "\t" + preline + "- Autoindex: " + (_autoindex == true ? std::string("true") : std::string("false")) + "\n";
 
 	/* Index */
-	buffer += "\t- Index:\n";
-	for (std::vector<std::string>::const_iterator it; it != _indexes.end(); it++)
-		buffer += "\t\t· \"" + *it + "\"\n";
+	buffer += "\t" + preline + "- Index:";
+	if (_indexes.size() == 0)
+		buffer += " None";
+	buffer += "\n";
+	for (std::vector<std::string>::const_iterator it = _indexes.begin(); it != _indexes.end(); it++)
+		buffer += "\t\t" + preline + "· \"" + *it + "\"\n";
 
 	/* Error_pages */
-	buffer += "\t- Error pages:\n";
-	for (std::map<int, std::string>::const_iterator it; it != _error_pages.end(); it++)
+	buffer += "\t" + preline + "- Error pages:";
+	if (_error_pages.size() == 0)
+		buffer += " None";
+	buffer += "\n";
+	for (std::map<int, std::string>::const_iterator it = _error_pages.begin(); it != _error_pages.end(); it++)
 	{
 		ss.str("");
 		ss << it->first;
-		buffer += "\t\t· " + ss.str() + ": \"" + it->second + "\"";
+		buffer += "\t\t" + preline + "· " + ss.str() + ": \"" + it->second + "\"";
 	}
 
 	/* Return data */
 	ss.str("");
 	ss << _return_data.code;
-	buffer += "\t- Return data:\n\t\t· " + ss.str() + "\n\t\t· Text: " + _return_data.text + "\n";
+	buffer += "\t" + preline + "- Return data:\n\t\t" +
+		preline + "· " + ss.str() + "\n\t\t" +
+		preline + "· Text: \"" + _return_data.text + "\"\n";
 
 	/* CGIs*/
-	buffer += "\t- CGI:\n";
-	for (std::map<std::string, std::string>::const_iterator it; it != _cgi.end(); it++)
-		buffer += "\t\t· " + it->first + ": \"" + it->second + "\"";
+	buffer += "\t" + preline + "- CGI:";
+	if (_cgi.size() == 0)
+		buffer += " None";
+	buffer += "\n";
+	for (std::map<std::string, std::string>::const_iterator it = _cgi.begin(); it != _cgi.end(); it++)
+		buffer += "\t\t" + preline + "· " + it->first + ": \"" + it->second + "\"";
 
 	return buffer;
 }

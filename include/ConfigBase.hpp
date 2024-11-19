@@ -76,6 +76,7 @@ class ConfigBase
 
 		/* NOTE: Objects features */
 		std::string	print( void ) const;
+		std::string	print( std::string preline ) const;
 
 		/* NOTE: Exceptions */
 

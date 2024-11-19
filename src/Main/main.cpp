@@ -28,6 +28,10 @@ int main(int argc, char *argv[])
 	if (servers.empty())
 		return (1);
 
+	/* DEBUGGING: print the servers data*/
+	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
+		std::cout << *it << std::endl;
+
 	/* If the vectors are valid, run them */
 	/* TODO: Check errors with exceptions? */
 	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
