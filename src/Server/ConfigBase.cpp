@@ -69,14 +69,14 @@ std::string	ConfigBase::print( std::string preline ) const
 	{
 		ss.str("");
 		ss << it->first;
-		buffer += "\t\t" + preline + "· " + ss.str() + ": \"" + it->second + "\"";
+		buffer += "\t\t" + preline + "· " + ss.str() + ": \"" + it->second + "\"\n";
 	}
 
 	/* Return data */
 	ss.str("");
 	ss << _return_data.code;
 	buffer += "\t" + preline + "- Return data:\n\t\t" +
-		preline + "· " + ss.str() + "\n\t\t" +
+		preline + "· Code: " + ss.str() + "\n\t\t" +
 		preline + "· Text: \"" + _return_data.text + "\"\n";
 
 	/* CGIs*/
@@ -85,7 +85,7 @@ std::string	ConfigBase::print( std::string preline ) const
 		buffer += " None";
 	buffer += "\n";
 	for (std::map<std::string, std::string>::const_iterator it = _cgi.begin(); it != _cgi.end(); it++)
-		buffer += "\t\t" + preline + "· " + it->first + ": \"" + it->second + "\"";
+		buffer += "\t\t" + preline + "· " + it->first + ": \"" + it->second + "\"\n";
 
 	return buffer;
 }
@@ -175,6 +175,64 @@ void							ConfigBase::set_return( ReturnData data )
 /*============================================================================*/
 /* SECTION:                      Object features                              */
 /*============================================================================*/
+
+void	ConfigBase::inherit( ConfigBase const& src )
+{
+	/* Copy the error pages */
+	for (
+		std::map<int, std::string>::const_iterator it = src._error_pages.begin();
+		it != src._error_pages.end();
+		it++
+	)
+	{
+		if (_error_pages.find(it->first) == _error_pages.end())
+			_error_pages.insert(std::pair<int, std::string>(it->first, it->second));
+	}
+
+	/* Copy the client max body size */
+	/* FIXME: what happens when location.client_max_size == default and server != default */
+	if (_client_max_body_size == CLIENT_MAX_BODY_SIZE_DEFAULT)
+		_client_max_body_size = src._client_max_body_size;
+
+	/* Copy the root */
+	if (_root == ROOT_DEFAULT)
+		_root = src._root;
+
+	/* Copy the indexes */
+	for (
+		std::vector<std::string>::const_iterator it = src._indexes.begin();
+		it != src._indexes.end();
+		it++
+	)
+	{
+		if (std::find(_indexes.begin(), _indexes.end(), *it) == _indexes.end())
+			_indexes.push_back(*it);
+	}
+
+	/* Copy the autoindex */
+	/* FIXME: error when location.autoindex == default and server.autoindex != default */
+	if (_autoindex == AUTOINDEX_DEFAULT)
+		_autoindex = src._autoindex;
+
+	/* Copy the cgis */
+	for (
+		std::map<std::string, std::string>::const_iterator it = src._cgi.begin();
+		it != src._cgi.end();
+		it++
+	)
+	{
+		if (_cgi.find(it->first) == _cgi.end())
+			_cgi.insert(std::pair<std::string, std::string>(it->first, it->second));
+	}
+
+	/* Copy the return data */
+	if (_return_data.code == -1 && _return_data.text == "")
+	{
+		_return_data.code = src._return_data.code;
+		_return_data.text = src._return_data.text;
+	}
+
+}
 
 /*==========*/
 /* !SECTION */

@@ -4,7 +4,6 @@
 # define ERROR_PAGE_DEFAULT	NULL
 
 /* Default max size of a HTTP request -> 100 bytes/characters */
-/* TODO: check the nginx value */
 # define CLIENT_MAX_BODY_SIZE_DEFAULT	100
 
 /* Default alias -> None */

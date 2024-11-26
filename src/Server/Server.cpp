@@ -95,7 +95,10 @@ Location const*	Server::get_location( std::string name ) const
 void	Server::add_location( std::string name, Location location )
 {
 	if (_locations.find( name ) == _locations.end())
+	{
+		location.inherit(*this);
 		_locations.insert(std::pair<std::string, Location>(name, location));
+	}
 }
 
 /*==========*/

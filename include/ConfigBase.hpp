@@ -78,6 +78,8 @@ class ConfigBase
 		std::string	print( void ) const;
 		std::string	print( std::string preline ) const;
 
+		void	inherit( ConfigBase const& src );
+
 		/* NOTE: Exceptions */
 
 };

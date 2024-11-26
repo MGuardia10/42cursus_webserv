@@ -29,12 +29,13 @@ static std::vector<Server> hardcodedServers( void )
 	Location l1s1 = Location("/");
 	ConfigBase::ReturnData l1s1_return = {.code = 200, .text = "Acceso a location /"};
 	l1s1.set_return(l1s1_return);
-	s1.add_location("/", l1s1);
+	s1.add_location(l1s1.get_route(), l1s1);
 
 	Location l2s1 = Location("/test");
-	l2s1.add_cgi("py", "/bin/python3");
+	l2s1.add_cgi("py", "/bin/python");
 	l2s1.set_alias("port.html");
-	l2s1.set_client_max_size(1000);
+	l2s1.set_client_max_size(123);
+	s1.add_location(l2s1.get_route(), l2s1);
 
 	servers.push_back(s1);
 
@@ -51,7 +52,7 @@ static std::vector<Server> hardcodedServers( void )
 	Location l1s2 = Location("/");
 	l1s2.set_root("/pages");
 	l1s2.add_index("index.html");
-	s2.add_location("/", l1s2);
+	s2.add_location(l1s2.get_route(), l1s2);
 
 	Location l2s2 = Location("/redirect");
 	ConfigBase::ReturnData l2s2_return = {
@@ -59,7 +60,7 @@ static std::vector<Server> hardcodedServers( void )
 		.text = "https://www.google.com"
 	};
 	l2s2.set_return(l2s2_return);
-	s2.add_location("/redirect", l2s2);
+	s2.add_location(l2s2.get_route(), l2s2);
 
 	servers.push_back(s2);
 
