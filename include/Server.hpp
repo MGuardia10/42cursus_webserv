@@ -53,9 +53,18 @@ class Server : public ConfigBase
 		std::string	print( void ) const;
 
 		void	run( void );
-		void	stop( void);
+		void	stop( void );
 
 		/* NOTE: Exceptions */
+		class ServerException : std::exception
+		{
+			private:
+				std::string const _msg;
+			public:
+				ServerException( std::string const msg ) throw();
+				virtual ~ServerException( void ) throw();
+				virtual const char* what( void ) const throw();
+		};
 
 };
 

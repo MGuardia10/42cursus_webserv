@@ -34,9 +34,16 @@ int main(int argc, char *argv[])
 		std::cout << *it << std::endl;
 
 	/* If the vectors are valid, run them */
-	/* TODO: Check errors with exceptions? */
-	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
-		it->run();
+	try
+	{
+		for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
+			it->run();
+	}
+	catch (std::exception const& e)
+	{
+		std::cout << "Error while running a server: " << e.what() << std::endl;
+		return (1);
+	}
 
 	/* TODO: Loop (until SIGINT) to detect the servers connections */
 	processRequests(servers);

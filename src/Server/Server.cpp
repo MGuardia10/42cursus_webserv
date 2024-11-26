@@ -129,6 +129,17 @@ void	Server::stop( void )
 /* SECTION:                        Exceptions                                 */
 /*============================================================================*/
 
+Server::ServerException::ServerException( std::string const msg ) throw():
+	_msg(msg)
+{}
+
+Server::ServerException::~ServerException( void ) throw() {}
+
+const char* Server::ServerException::what( void ) const throw()
+{
+	return _msg.c_str();
+}
+
 /*==========*/
 /* !SECTION */
 /*==========*/
