@@ -3,6 +3,7 @@
 #include "../../include/Server.hpp"
 #include "../../include/signals.hpp"
 #include "../../include/parse.hpp"
+#include "../../include/processRequests.hpp"
 
 int	help(char *cmd)
 {
@@ -38,6 +39,7 @@ int main(int argc, char *argv[])
 		it->run();
 
 	/* TODO: Loop (until SIGINT) to detect the servers connections */
+	processRequests(servers);
 
 	/* Stop the servers and free the ports */
 	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)

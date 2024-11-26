@@ -26,7 +26,8 @@ HEADERS=	ConfigBase.hpp	\
 
 # NOTE: Source files
 MAIN_SRC =	main.cpp		\
-			signals.cpp
+			signals.cpp		\
+			processRequests.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 PARSE_SRC =	parse.cpp
