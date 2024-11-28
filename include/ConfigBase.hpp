@@ -13,6 +13,15 @@ class ConfigBase
 			std::string	text;
 		};
 
+	private:
+		enum {
+			CLIENT_MAX_BODY_SIZE_INDEX = 0,
+			ROOT_INDEX,
+			AUTOINDEX_INDEX,
+			TOTAL_INDEX
+		};
+		bool	_inicializated[TOTAL_INDEX];
+
 	protected:
 		/* Error pages: <status_code, page_path> */
 		std::map<int, std::string>	_error_pages;

@@ -19,6 +19,10 @@ ConfigBase::ConfigBase( void ) :
 	/* Init the return struct */
 	_return_data.code = -1;
 	_return_data.text = "";
+
+	/* Init the array to know what data is iniciated */
+	for (int i = 0; i < TOTAL_INDEX; i++)
+		_inicializated[i] = false;
 }
 
 ConfigBase::~ConfigBase( void )
@@ -121,13 +125,20 @@ void						ConfigBase::add_error_page( int code, std::string path )
 /* NOTE: Client Max Size */
 /*************************/
 size_t	ConfigBase::get_client_max_size( void ) const { return _client_max_body_size; }
-void	ConfigBase::set_client_max_size( size_t client_max_size ) { _client_max_body_size = client_max_size; }
+void	ConfigBase::set_client_max_size( size_t client_max_size )
+{
+	_client_max_body_size = client_max_size;
+	_inicializated[CLIENT_MAX_BODY_SIZE_INDEX] = true;
+}
 
 /**************/
 /* NOTE: Root */
 /**************/
 std::string	ConfigBase::get_root( void ) const	{ return _root; }
-void		ConfigBase::set_root( std::string root ) { _root = root; }
+void		ConfigBase::set_root( std::string root ) {
+	_root = root;
+	_inicializated[ROOT_INDEX] = true;
+}
 
 /*****************/
 /* NOTE: Indexes */
@@ -143,7 +154,10 @@ void	ConfigBase::add_index( std::string index )
 /* NOTE: Autoindex */
 /*******************/
 bool	ConfigBase::get_autoindex( void ) const		{ return _autoindex; }
-void	ConfigBase::set_autoindex( bool autoindex )	{ _autoindex = autoindex; }
+void	ConfigBase::set_autoindex( bool autoindex )	{
+	_autoindex = autoindex;
+	_inicializated[AUTOINDEX_INDEX] = false;
+}
 
 /*************/
 /* NOTE: CGI */
@@ -190,12 +204,11 @@ void	ConfigBase::inherit( ConfigBase const& src )
 	}
 
 	/* Copy the client max body size */
-	/* FIXME: what happens when location.client_max_size == default and server != default */
-	if (_client_max_body_size == CLIENT_MAX_BODY_SIZE_DEFAULT)
+	if (!_inicializated[CLIENT_MAX_BODY_SIZE_INDEX])
 		_client_max_body_size = src._client_max_body_size;
 
 	/* Copy the root */
-	if (_root == ROOT_DEFAULT)
+	if (!_inicializated[ROOT_INDEX])
 		_root = src._root;
 
 	/* Copy the indexes */
@@ -210,8 +223,7 @@ void	ConfigBase::inherit( ConfigBase const& src )
 	}
 
 	/* Copy the autoindex */
-	/* FIXME: error when location.autoindex == default and server.autoindex != default */
-	if (_autoindex == AUTOINDEX_DEFAULT)
+	if (!_inicializated[AUTOINDEX_INDEX])
 		_autoindex = src._autoindex;
 
 	/* Copy the cgis */
