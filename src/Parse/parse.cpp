@@ -26,9 +26,15 @@ static std::vector<Server> hardcodedServers( void )
 	ConfigBase::ReturnData s1_return = {.code = 300, .text = "Redirigiendo..."};
 	s1.set_return(s1_return);
 
+	s1.add_method("GET");
+	s1.add_method("DELETE");
+	s1.add_method("POST");
+	s1.add_method("DELETE");
+
 	Location l1s1 = Location("/");
 	ConfigBase::ReturnData l1s1_return = {.code = 200, .text = "Acceso a location /"};
 	l1s1.set_return(l1s1_return);
+	l1s1.add_method("DELETE");
 	s1.add_location(l1s1.get_route(), l1s1);
 
 	Location l2s1 = Location("/test");
@@ -60,6 +66,8 @@ static std::vector<Server> hardcodedServers( void )
 		.text = "https://www.google.com"
 	};
 	l2s2.set_return(l2s2_return);
+	l2s2.add_method("DELETE");
+	l2s2.add_method("POST");
 	s2.add_location(l2s2.get_route(), l2s2);
 
 	servers.push_back(s2);
