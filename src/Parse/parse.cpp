@@ -23,7 +23,7 @@ static std::vector<Server> hardcodedServers( void )
 	s1.add_cgi("sh", "/bin/bash");
 	s1.add_cgi("py", "/bin/python3");
 
-	ConfigBase::ReturnData s1_return = {.code = 200, .text = "Redirigiendo..."};
+	ConfigBase::ReturnData s1_return = {.code = 300, .text = "Redirigiendo..."};
 	s1.set_return(s1_return);
 
 	Location l1s1 = Location("/");
