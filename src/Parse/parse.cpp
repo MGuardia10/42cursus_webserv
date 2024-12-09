@@ -8,8 +8,10 @@ static std::vector<Server> hardcodedServers( void )
 	/* TODO: Server 1 */
 	Server s1;
 
+	s1.set_ip("127.0.0.2");
 	s1.set_ip("127.0.0.1");
-	s1.set_port(8080);
+	s1.add_port(8080);
+	s1.add_port(8081);
 	s1.set_server_name("Test");
 
 	s1.add_error_page(400, "/400.html");
@@ -48,8 +50,7 @@ static std::vector<Server> hardcodedServers( void )
 	/* TODO: Server 2*/
 	Server s2;
 
-	s2.set_ip("127.0.0.1");
-	s2.set_port(8081);
+	s2.add_port(8081);
 	s2.set_server_name("Test2");
 	s2.set_root("/");
 

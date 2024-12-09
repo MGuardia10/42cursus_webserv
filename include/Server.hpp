@@ -16,8 +16,8 @@ class Server : public ConfigBase
 		bool	_is_running;
 
 		/* Port where the server will be listening */
-		std::string	_ip;
-		int			_port;
+		std::string			_ip;
+		std::vector<int>	_ports;
 
 		/* Name of the server */
 		std::string	_server_name;
@@ -39,8 +39,9 @@ class Server : public ConfigBase
 		std::string	get_ip( void ) const;
 		void		set_ip( std::string ip );
 
-		int			get_port( void ) const;
-		void		set_port( int port );
+		std::vector<int>	get_ports( void ) const;
+		void				add_port( int port );
+		bool				has_port( int port );
 
 		std::string	get_server_name( void ) const;
 		void		set_server_name( std::string server_name );
