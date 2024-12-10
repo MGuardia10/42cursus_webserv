@@ -11,13 +11,33 @@ COLOR_RESET		= \e[0m
 CXX			:= c++
 CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -fdiagnostics-color=always
 #####################################################################################################################
-VPATH=src/:
+# Paths to find the files
+VPATH =	include/:		\
+		src/:			\
+		src/Main/:		\
+		src/Parse:		\
+		src/Server/:
 OBJ_FOLDER=obj
 
-HEADERS=	Server.hpp
-SRC=		main.cpp	\
-			Server.cpp
-OBJ=$(SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+# NOTE: Headers
+HEADERS=	ConfigBase.hpp	\
+			Location.hpp	\
+			Server.hpp
+
+# NOTE: Source files
+MAIN_SRC =	main.cpp		\
+			signals.cpp		\
+			processRequests.cpp
+OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
+PARSE_SRC =	parse.cpp
+OBJ += $(PARSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
+SERVER_SRC =	ConfigBase.cpp	\
+				Location.cpp	\
+				Server.cpp
+OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
 #####################################################################################################################
 
 all: $(NAME)
@@ -43,13 +63,12 @@ $(OBJ_FOLDER)/%.o: %.cpp $(HEADERS)
 		echo "$(COLOR_BLUE)[ C++ ] Compiling c++ files ($(COLOR_CYAN)$(CXXFLAGS)$(COLOR_BLUE))$(COLOR_RESET)";		\
 	fi
 
-
 	@echo -n "\t$(COLOR_CYAN)[......]  Compiling $<...$(COLOR_RESET)"
 	@RES=$$($(CXX) $(CXXFLAGS) -c $< -o $@ 2> $(OBJ_FOLDER)/.error; echo $$?);	\
 	if [ $$RES -ne 0 ]; then													\
 		echo "\r\t$(COLOR_RED)[ ERROR ]$(COLOR_RESET)";							\
 		tail -n +1 $(OBJ_FOLDER)/.error;										\
-		make -s CLEAN_EXTENSION													\
+		make -s CLEAN_EXTENSION;												\
 		exit $$RES;																\
 	fi
 
@@ -79,7 +98,7 @@ re: fclean all
 # Variables to execute the programm. It can be modified to add the parameters
 # that you want to pass to the program.
 EXECUTE_WAY	= ./$(NAME)
-EXECUTE_ARGS= 8080 10
+EXECUTE_ARGS= config/default.conf
 
 # Debugger information
 DEFAULT_SCRUBBER		= valgrind

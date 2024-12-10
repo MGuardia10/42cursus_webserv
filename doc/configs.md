@@ -13,6 +13,8 @@
 	- [fastcgi_pass](#2.11)
 3. [Directivas Propias](#3.0)
 4. [Useful Links](#4.0)
+5. [Tokens table](#5.0)
+
 
 ## <b id="1.0">REQUISITOS SUBJECT</b>
 
@@ -264,3 +266,18 @@ Ir documentando aquí las directivas que hagamos nuestras para luego hacer docum
 
 - [Indice de directivas Nginx](https://nginx.org/en/docs/dirindex.html)
 - [Como Nginx procesa una request](https://nginx.org/en/docs/http/request_processing.html)
+
+
+## <b id="5.0">TOKENS TABLE</b>
+|Tokens|Server|Location|Added 2 both class|Default|Implemented|
+|-|-|-|-|-|-|
+|listen|✔||✔ (port)|[NP] -1|[X]|
+|server_name|✔||✔|[P] "Server X"|[X]|
+|error_page|✔|✔|✔|[P] <40x and 50x> -> pages/error|[X]|
+|client_max_body_size|✔|✔|✔|[P] 100b|[X]|
+|return|✔|✔|✔|[P] {-1, ""}|[X]|
+|alias||✔|✔|[P] ""|[X]|
+|root|✔|✔|✔|[P] "pages/"|[X]|
+|index|✔|✔|✔|[NP] <empty> (-> error)|[X]|
+|autoindex|✔|✔|✔|[P] false|[X]|
+|cgi_pass|✔|✔|✔|[NP] \<empty\>|[X]|

@@ -1,0 +1,56 @@
+#include <iostream>
+#include <vector>
+#include "../../include/Server.hpp"
+#include "../../include/signals.hpp"
+#include "../../include/parse.hpp"
+#include "../../include/processRequests.hpp"
+
+int	help(char *cmd)
+{
+	std::cout <<
+		"Usage: " << cmd << " <CONFIG_FILE>"
+	<< std::endl;
+	return (1);
+}
+
+int main(int argc, char *argv[])
+{
+	std::vector<Server>	servers;
+
+	/* Check the params number */
+	if (argc != 2)
+		return help(argv[0]);
+
+	/* Assign the necessary signals (SIGINT) */
+	assign_signals();
+
+	/* Get the servers vector */
+	servers = parse(argv[1]);
+	if (servers.empty())
+		return (1);
+
+	/* DEBUGGING: print the servers data*/
+	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
+		std::cout << *it << std::endl;
+
+	/* If the vectors are valid, run them */
+	try
+	{
+		for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
+			it->run();
+	}
+	catch (std::exception const& e)
+	{
+		std::cout << "Error while running a server: " << e.what() << std::endl;
+		return (1);
+	}
+
+	/* TODO: Loop (until SIGINT) to detect the servers connections */
+	processRequests(servers);
+
+	/* Stop the servers and free the ports */
+	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
+		it->stop();
+
+	return (0);
+}
