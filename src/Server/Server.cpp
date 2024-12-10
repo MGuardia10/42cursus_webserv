@@ -1,5 +1,6 @@
 #include "../../include/Server.hpp"
 #include <sstream>
+#include <algorithm>
 
 /*============================================================================*/
 /* SECTION:               Constructors and destructor                         */
@@ -9,13 +10,14 @@ int Server::servers_count = 0;
 
 Server::Server( void ) : ConfigBase(),
 	_is_running(false),
-	_ip(IP_DEFAULT),
-	_port(-1)
+	_ip(IP_DEFAULT)
 {
 	/* Set the name to the server */
 	std::stringstream	ss;
 	ss << ++Server::servers_count;
 	_server_name = "Server " + ss.str();
+
+	_ports.push_back(-1);
 
 	/* Clear the lists/vectors */
 	_locations.clear();
@@ -47,8 +49,16 @@ std::string	Server::print( void ) const
 
 	buffer += "\t· Is running: " + (_is_running ? std::string("true") : std::string("false")) + "\n";
 
-	ss << _port;
-	buffer += "\t· Connection: " + _ip + ":" + ss.str() + "\n";
+	buffer += "\t· Connections: ";
+	if (_ports.size() == 0)
+		buffer += "None";
+	buffer += "\n";
+	for (std::vector<int>::const_iterator it = _ports.begin(); it != _ports.end(); it++)
+	{
+		ss.str("");
+		ss << *it;
+		buffer += "\t\t- " + ss.str() + "\n";
+	}
 
 	buffer += "\t· Locations:\n\n";
 	for (std::map<std::string, Location>::const_iterator it = _locations.begin(); it != _locations.end(); it++)
@@ -76,8 +86,18 @@ std::string	Server::get_ip( void ) const { return _ip; }
 void		Server::set_ip( std::string ip ) { _ip = ip; }
 
 /* Port */
-int		Server::get_port( void ) const { return _port; }
-void	Server::set_port( int port ) { _port = port; }
+std::vector<int>	Server::get_ports( void ) const { return _ports; }
+void	Server::add_port( int port )
+{
+	if (_ports.size() == 1 && _ports.at(0) == -1)
+		_ports.clear();
+	if (!has_port(port))
+		_ports.push_back(port);
+}
+bool	Server::has_port( int port )
+{
+	return std::find(_ports.begin(), _ports.end(), port) != _ports.end();
+}
 
 /* Server name */
 std::string	Server::get_server_name( void ) const { return _server_name; }

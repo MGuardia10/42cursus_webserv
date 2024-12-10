@@ -1,5 +1,5 @@
 # Base image of 42 OS
-FROM    ubuntu:20.04
+FROM    ubuntu:22.04
 
 # Update system
 RUN     apt update && apt upgrade -y

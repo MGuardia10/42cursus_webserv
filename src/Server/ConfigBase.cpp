@@ -20,6 +20,9 @@ ConfigBase::ConfigBase( void ) :
 	_return_data.code = -1;
 	_return_data.text = "";
 
+	/* Append the GET method */
+	_methods.push_back("GET");
+
 	/* Init the array to know what data is iniciated */
 	for (int i = 0; i < TOTAL_INDEX; i++)
 		_inicializated[i] = false;
@@ -63,6 +66,14 @@ std::string	ConfigBase::print( std::string preline ) const
 	buffer += "\n";
 	for (std::vector<std::string>::const_iterator it = _indexes.begin(); it != _indexes.end(); it++)
 		buffer += "\t\t" + preline + "· \"" + *it + "\"\n";
+
+	/* Methods */
+	buffer += "\t" + preline + "- Methods:";
+	if (_methods.size() == 0)
+		buffer += "None";
+	buffer += "\n";
+	for (std::vector<std::string>::const_iterator it = _methods.begin(); it != _methods.end(); it++)
+		buffer += "\t\t" + preline + "· " + *it + "\n";
 
 	/* Error_pages */
 	buffer += "\t" + preline + "- Error pages:";
@@ -184,6 +195,31 @@ void							ConfigBase::set_return( ReturnData data )
 	_return_data.text = data.text;
 }
 
+/*****************/
+/* NOTE: Methods */
+/*****************/
+std::vector<std::string>	ConfigBase::get_methods( void ) const { return _methods; }
+bool						ConfigBase::has_method( std::string method ) const
+{
+	return std::find(_methods.begin(), _methods.end(), method) != _methods.end();
+}
+
+void						ConfigBase::add_method( std::string method )
+{
+	if (!_inicializated[METHODS_INDEX])
+	{
+		_methods.clear();
+		_inicializated[METHODS_INDEX] = true;
+	}
+
+	/* Check if the method is already on the vector */
+	if (has_method(method))
+		return;
+
+	/* Append */
+	_methods.push_back(method);
+}
+
 /*==========*/
 /* !SECTION */
 /*============================================================================*/
@@ -242,6 +278,18 @@ void	ConfigBase::inherit( ConfigBase const& src )
 	{
 		_return_data.code = src._return_data.code;
 		_return_data.text = src._return_data.text;
+	}
+
+	/* Copy the methods */
+	if (!_inicializated[METHODS_INDEX])
+	{
+		_methods.clear();
+
+		for (std::vector<std::string>::const_iterator it = src._methods.begin(); it != src._methods.end(); it++)
+		{
+			if (!has_method(*it))
+				_methods.push_back(*it);
+		}
 	}
 
 }

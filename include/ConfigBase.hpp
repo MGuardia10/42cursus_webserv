@@ -18,6 +18,7 @@ class ConfigBase
 			CLIENT_MAX_BODY_SIZE_INDEX = 0,
 			ROOT_INDEX,
 			AUTOINDEX_INDEX,
+			METHODS_INDEX,
 			TOTAL_INDEX
 		};
 		bool	_inicializated[TOTAL_INDEX];
@@ -43,6 +44,9 @@ class ConfigBase
 
 		/* Return field */
 		ReturnData	_return_data;
+
+		/* Allowed methods */
+		std::vector<std::string> _methods;
 
 		/* NOTE: Constructors and destructor */
 		ConfigBase( void );
@@ -80,8 +84,16 @@ class ConfigBase
 		void								add_cgi( std::string extension, std::string path );
 
 		/* Return */
-		ReturnData const&	get_return( void ) const;
-		void	set_return( ReturnData data );
+		ReturnData const&					get_return( void ) const;
+		void						set_return( ReturnData data );
+
+		/* Methods */
+		std::vector<std::string>	get_methods( void ) const;
+		bool						has_method( std::string const method ) const;
+
+		void						add_method( std::string method );
+
+
 
 		/* NOTE: Objects features */
 		std::string	print( void ) const;
