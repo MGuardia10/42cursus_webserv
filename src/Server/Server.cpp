@@ -129,6 +129,7 @@ void	Server::add_location( std::string name, Location location )
 
 void	Server::run( void )
 {
+	/* Check if the server is running */
 	if (_is_running)
 		return ;
 	_is_running = true;
@@ -138,6 +139,7 @@ void	Server::run( void )
 
 void	Server::stop( void )
 {
+	/* Check if the server is running */
 	if (!_is_running)
 		return ;
 	_is_running = false;
