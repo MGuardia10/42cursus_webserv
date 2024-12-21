@@ -2,6 +2,21 @@
 #include <sstream>
 #include <algorithm>
 
+#include <cstdio>
+#include <cstdlib>
+#include <sstream>
+#include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
+#include <cerrno>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+
 /*============================================================================*/
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
@@ -18,6 +33,7 @@ Server::Server( void ) : ConfigBase(),
 	_server_name = "Server " + ss.str();
 
 	_ports.push_back(-1);
+	_sockets.clear();
 
 	/* Clear the lists/vectors */
 	_locations.clear();
@@ -103,6 +119,13 @@ bool	Server::has_port( int port )
 std::string	Server::get_server_name( void ) const { return _server_name; }
 void		Server::set_server_name( std::string server_name ) { _server_name = server_name; }
 
+/* Sockets */
+std::vector<int>	Server::get_sockets( void ) const { return _sockets; }
+bool				Server::has_socket( int socket_fd ) const
+{
+	return std::find(_sockets.begin(), _sockets.end(), socket_fd) != _sockets.end();
+}
+
 /* Location */
 std::map<std::string, Location>	Server::get_locations( void ) const { return _locations; }
 
@@ -134,7 +157,61 @@ void	Server::run( void )
 		return ;
 	_is_running = true;
 
-	/* TODO: Implementation of the function */
+	/* Create all the ports connections */
+	for (std::vector<int>::iterator it = _ports.begin(); it != _ports.end(); it++)
+	{
+		int port = *it;
+
+		/* Open the socket */
+		int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+		if (socket_fd == -1)
+			throw ServerException("Error while initializing the socket", strerror(errno));
+		
+		/* Set the socket to non-blocking */
+		int flags = fcntl(socket_fd, F_GETFL, 0);
+		if (flags == -1 || fcntl(socket_fd, F_SETFL, flags | O_NONBLOCK) == -1)
+		{
+			close(socket_fd);
+			throw ServerException("Error setting the socket to non-blocking", strerror(errno));
+		}
+
+		/* Configure the socket */
+		int optval = 1;
+		if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == -1)
+		{
+			close(socket_fd);
+			throw ServerException("Error setting the socket configuration", strerror(errno));
+		}
+
+		/* Bind the socket to the specefied IP and port */
+		struct sockaddr_in addr;
+		bzero(&addr, sizeof(addr));
+		addr.sin_family = AF_INET;
+		addr.sin_port = htons(port);
+
+		if (inet_pton(AF_INET, _ip.c_str(), &addr.sin_addr) <= 0)
+		{
+			close(socket_fd);
+			throw ServerException("Invalid server IP", strerror(errno));
+		}
+
+		/* Bind the socket to the port */
+		if (bind(socket_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+		{
+			close(socket_fd);
+			throw ServerException("Error binding the socket", strerror(errno));
+		}
+
+		/* Active the listen */
+		if (listen(socket_fd, BACKLOG) == -1)
+		{
+			close(socket_fd);
+			throw ServerException("Error while starting the listen", strerror(errno));
+		}
+
+		/* Add the socket to the active sockets list */
+		_sockets.push_back(socket_fd);
+	}
 }
 
 void	Server::stop( void )
@@ -144,7 +221,9 @@ void	Server::stop( void )
 		return ;
 	_is_running = false;
 
-	/* TODO: Implementation of the function */
+	/* Close all the socket fds */
+	for (std::vector<int>::iterator it = _sockets.begin(); it != _sockets.end(); it++)
+		close(*it);
 }
 
 /*==========*/
@@ -156,6 +235,10 @@ void	Server::stop( void )
 
 Server::ServerException::ServerException( std::string const msg ) throw():
 	_msg(msg)
+{}
+
+Server::ServerException::ServerException( std::string const msg, std::string const error ) throw():
+	_msg(msg + ": " + error)
 {}
 
 Server::ServerException::~ServerException( void ) throw() {}
