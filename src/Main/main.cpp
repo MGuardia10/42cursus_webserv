@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 		for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
 			it->run();
 	}
-	catch (std::exception const& e)
+	catch (Server::ServerException& e)
 	{
 		std::cout << "Error while running a server: " << e.what() << std::endl;
 		return (1);
