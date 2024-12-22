@@ -49,6 +49,7 @@ static std::vector<Server> hardcodedServers( void )
 	/* TODO: Server 2*/
 	Server s2;
 
+	s2.set_ip("127.0.0.2");
 	s2.add_port(8081);
 	s2.set_server_name("Test2");
 	s2.set_root("/");
