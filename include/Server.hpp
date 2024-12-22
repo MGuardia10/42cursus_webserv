@@ -54,9 +54,9 @@ class Server : public ConfigBase
 		std::vector<int>	get_sockets( void ) const;
 		bool				has_socket( int sckt ) const;
 
-		std::map<std::string, Location>	get_locations( void ) const;
-		Location const*					get_location( std::string name ) const;
-		void							add_location( std::string name, Location location );
+		std::map<std::string, Location>		get_locations( void ) const;
+		std::pair<bool, Location const*>	get_location( std::string route ) const;
+		void								add_location( std::string route, Location location );
 
 		/* NOTE: Objects features */
 		std::string	print( void ) const;

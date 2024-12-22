@@ -128,19 +128,39 @@ bool				Server::has_socket( int socket_fd ) const
 
 /* Location */
 std::map<std::string, Location>	Server::get_locations( void ) const { return _locations; }
-
-Location const*	Server::get_location( std::string name ) const
+std::pair<bool, Location const*>	Server::get_location( std::string route ) const
 {
-	std::map<std::string, Location>::const_iterator it = _locations.find(name);
-	return (it == _locations.end() ? NULL : &(it->second));
+	std::map<std::string, Location>::const_iterator it;
+	int index;
+
+	/* Check if the route exists on the saved locations maps */
+	std::string last;
+	while (1)
+	{
+		it = _locations.find(route);
+		if (it != _locations.end())
+			return std::pair<bool, Location const*>(true, &(it->second));
+
+		index = route.rfind("/");
+		last = route.substr(0, index);
+		if (last.empty())
+			last = "/";
+		if (last == route)
+			break ;
+		route = last;
+		std::cout << "\t# [" << route << "]" << std::endl;
+	};
+
+	/* The location has not been found */
+	return std::pair<bool, Location const*>(false, NULL);
 }
 
-void	Server::add_location( std::string name, Location location )
+void	Server::add_location( std::string route, Location location )
 {
-	if (_locations.find( name ) == _locations.end())
+	if (_locations.find( route ) == _locations.end())
 	{
 		location.inherit(*this);
-		_locations.insert(std::pair<std::string, Location>(name, location));
+		_locations.insert(std::pair<std::string, Location>(route, location));
 	}
 }
 
@@ -161,6 +181,9 @@ void	Server::run( void )
 	for (std::vector<int>::iterator it = _ports.begin(); it != _ports.end(); it++)
 	{
 		int port = *it;
+
+		if (port < 0 && port > 656656)
+			throw ServerException("Invalid port");
 
 		/* Open the socket */
 		int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
