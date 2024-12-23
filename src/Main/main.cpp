@@ -42,6 +42,10 @@ int main(int argc, char *argv[])
 	catch (Server::ServerException& e)
 	{
 		std::cout << "Error while running a server: " << e.what() << std::endl;
+
+		/* Close the started servers */
+		for (std::vector<Server>::iterator it = servers.begin(); it != servers.end() && (*it).is_running(); it++)
+			(*it).stop();
 		return (1);
 	}
 
