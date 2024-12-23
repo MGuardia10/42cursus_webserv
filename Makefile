@@ -22,7 +22,8 @@ OBJ_FOLDER=obj
 # NOTE: Headers
 HEADERS=	ConfigBase.hpp	\
 			Location.hpp	\
-			Server.hpp
+			Server.hpp		\
+			Client.hpp
 
 # NOTE: Source files
 MAIN_SRC =	main.cpp		\
@@ -35,7 +36,8 @@ OBJ += $(PARSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 SERVER_SRC =	ConfigBase.cpp	\
 				Location.cpp	\
-				Server.cpp
+				Server.cpp		\
+				Client.cpp
 OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 #####################################################################################################################
