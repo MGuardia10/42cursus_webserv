@@ -47,6 +47,8 @@ std::string	Server::print( void ) const
 
 	buffer += "[ SERVER ] " + _server_name + "\n";
 
+	buffer += "\t· Address: " + _ip + "\n";
+
 	buffer += "\t· Is running: " + (_is_running ? std::string("true") : std::string("false")) + "\n";
 
 	buffer += "\t· Connections: ";

@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <sstream>
+#include <cstdlib>
 #include "Server.hpp"
 
 typedef void (*Function)(const std::string, ConfigBase&);
@@ -27,17 +29,21 @@ template<typename T>
 int add_directive( std::string const line, T &item, std::map<std::string, Function> const directives_map );
 
 /* directives.cpp */
-void add_address( const std::string line, ConfigBase &item );
-void add_listen( const std::string line, ConfigBase &item );
-void add_server_name( const std::string line, ConfigBase &item );
-void add_root( const std::string line, ConfigBase &item );
-void add_client_max_body_size( const std::string line, ConfigBase &item );
-void add_error_page( const std::string line, ConfigBase &item );
-void add_index( const std::string line, ConfigBase &item );
-void add_autoindex( const std::string line, ConfigBase &item );
-void add_cgi_pass( const std::string line, ConfigBase &item );
-void add_return( const std::string line, ConfigBase &item );
-void add_methods( const std::string line, ConfigBase &item );
-void add_alias( const std::string line, ConfigBase &item );
+void add_address( std::string line, ConfigBase &item );
+void add_listen( std::string line, ConfigBase &item );
+void add_server_name( std::string line, ConfigBase &item );
+void add_root( std::string line, ConfigBase &item );
+void add_client_max_body_size( std::string line, ConfigBase &item );
+void add_error_page( std::string line, ConfigBase &item );
+void add_index( std::string line, ConfigBase &item );
+void add_autoindex( std::string line, ConfigBase &item );
+void add_cgi_pass( std::string line, ConfigBase &item );
+void add_return( std::string line, ConfigBase &item );
+void add_methods( std::string line, ConfigBase &item );
+void add_alias( std::string line, ConfigBase &item );
+
+/* checkDirectives.cpp */
+bool	is_valid_ipv4( std::string line );
+bool	is_valid_port( std::string line );
 
 #include "parse.tpp"
