@@ -48,10 +48,21 @@ void add_listen( std::string line, ConfigBase &item ) {
 	
 }
 
-void add_server_name( std::string line, ConfigBase &item ) { 
-	/* Castear a server */
-	(void)line;
-	(void)item;
+void add_server_name( std::string line, ConfigBase &item ) {
+
+	/* Cast to Server */
+	Server &server = static_cast<Server &>( item );
+
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("Invalid name on server_name directive.");
+
+	/* Set new server name */
+	server.set_server_name( line );
+
 }
 
 void add_root( std::string line, ConfigBase &item ) { 
