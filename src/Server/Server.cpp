@@ -41,8 +41,7 @@ Server::Server( void ) : ConfigBase(),
 
 Server::~Server( void )
 {
-	if (_is_running)
-		this->stop();
+	_is_running = false;
 	_locations.clear();
 }
 
