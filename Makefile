@@ -34,7 +34,8 @@ PARSE_SRC =	parse.cpp \
 			parseLocation.cpp \
 			parseServer.cpp \
 			directives.cpp \
-			getDirectives.cpp
+			getDirectives.cpp \
+			checkDirectives.cpp
 OBJ += $(PARSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 SERVER_SRC =	ConfigBase.cpp	\

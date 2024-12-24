@@ -77,7 +77,7 @@ std::vector<Server>	parse( std::string const& filename )
 		servers.clear();
 
 		/* Print error on stderror */
-		std::cerr << RED << e.what() << RESET << '\n';
+		std::cerr << RED << "[ ERROR ] " << filename << ": " << e.what() << RESET << '\n';
 	}
 	
 	/* Close config file */

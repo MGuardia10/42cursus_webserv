@@ -9,7 +9,7 @@ int add_directive( std::string const line, T &item, std::map<std::string, Functi
 	if ( it == directives_map.end() ) return 0;
 
 	/* Execute function associate with the key found */
-	it->second( line, item );
+	it->second( line.substr( key.size(), line.size() - key.size() - 1 ) , item );
 
 	return 1;
 }
