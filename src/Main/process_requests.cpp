@@ -1,4 +1,4 @@
-#include "../../include/processRequests.hpp"
+#include "../../include/process_requests.hpp"
 #include "../../include/Client.hpp"
 #include "../../include/signals.hpp"
 #include <poll.h>
@@ -104,7 +104,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	return false;
 }
 
-void	processRequests(std::vector<Server> servers_vector)
+void	process_requests(std::vector<Server> servers_vector)
 {
 	/* Storage variables */
 	std::map<int, Server> servers;
