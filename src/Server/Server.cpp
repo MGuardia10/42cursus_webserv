@@ -62,6 +62,8 @@ std::string	Server::print( void ) const
 		buffer += "\t\t- " + ss.str() + "\n";
 	}
 
+	buffer += static_cast<ConfigBase const&>(*this).print();
+
 	buffer += "\t· Locations:\n\n";
 	for (std::map<std::string, Location>::const_iterator it = _locations.begin(); it != _locations.end(); it++)
 		buffer += it->second.print() + "\n";
