@@ -199,15 +199,40 @@ void add_cgi_pass( std::string line, ConfigBase &item ) {
 }
 
 void add_return( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
-
+	
 	/* normalize line without directive key and semicolon */
 	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
 		throw std::invalid_argument("return directive cannot be empty.");
+
+	/* Check is valid line */
+	std::istringstream stream( line );
+	std::string code, text;
+
+	if ( std::getline( stream, code, ' ' ) && std::getline( stream, text ) ) {
+
+		/* ReturnData type variable */
+		ConfigBase::ReturnData data;
+
+		/* Check valid http code */
+		if ( ( data.code = http_code( code ) ) == -1 )
+			throw std::invalid_argument("Invalid return directive. Return code must be a valid HTTP code (between 100 and 599).");
+
+		/* Check valid URL/text */
+		if ( text.at(0) != '"' || text.at( text.size() - 1 ) != '"' )
+			throw std::invalid_argument("Invalid return directive. Return text must be all between quotes.");
+
+		/* Remove quotes from text to insert on data */
+		data.text = text.substr( 1, text.size() - 2 );
+
+		/* Set return data on item */
+		item.set_return( data );
+	}
+	else
+		throw std::invalid_argument("Invalid return directive. Return directive contains exactly one status code and one URL/text.");
+	
 }
 
 void add_methods( std::string line, ConfigBase &item ) { 
