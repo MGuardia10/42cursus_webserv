@@ -3,6 +3,7 @@
 #include <fstream>
 #include <vector>
 #include <sstream>
+#include <cstdlib>
 #include "Server.hpp"
 
 typedef void (*Function)(const std::string, ConfigBase&);

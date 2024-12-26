@@ -1,5 +1,4 @@
 #include "../../include/parse.hpp"
-#include <cstdlib>
 #include <set>
 
 void add_address( std::string line, ConfigBase &item ) {
@@ -80,13 +79,53 @@ void add_error_page( std::string line, ConfigBase &item ) {
 }
 
 void add_index( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
+	
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("Invalid file on index directive.");
+
+	/* Loop index by index */
+	std::istringstream stream( line );
+	std::string indexStr;
+
+	while ( std::getline( stream, indexStr, ' ' ) ) {
+		
+		/* Discard absolute paths and directories */
+		if ( indexStr.at( 0 ) == '/' )
+			throw std::invalid_argument("Invalid file on index directive. Index cannot be an absolute path.");
+		if ( indexStr.at( indexStr.size() - 1 ) == '/' )
+			throw std::invalid_argument("Invalid file on index directive. Index cannot be a directory.");
+		
+		/* Add index to item */
+		item.add_index( indexStr );
+	}
 }
 
 void add_autoindex( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
+	
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("Invalid value on autoindex directive. Accepted values are [ true, false ].");
+
+	/* Convert all chars to lowercase */
+    std::string lowerCaseLine;
+    for ( std::string::const_iterator it = line.begin(); it != line.end(); ++it ) {
+        lowerCaseLine += std::tolower( *it );
+	}
+
+	/* Set autoindex */
+	if ( lowerCaseLine.compare( "true" ) == 0 )
+		item.set_autoindex( true );
+	else if ( lowerCaseLine.compare( "false" ) == 0 )
+		item.set_autoindex( false );
+	else
+		throw std::invalid_argument("Invalid value on autoindex directive. Accepted values are [ true, false ].");
 }
 
 void add_cgi_pass( std::string line, ConfigBase &item ) { 
@@ -106,7 +145,7 @@ void add_methods( std::string line, ConfigBase &item ) {
 
 	/* Check line is empty */
 	if ( line.empty() )
-		throw std::invalid_argument( "No method found on methods directive." );
+		throw std::invalid_argument("No method found on methods directive.");
 
 	/* Valid methods for our Server */
 	std::set<std::string> validMethods;

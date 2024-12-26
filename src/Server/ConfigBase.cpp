@@ -167,7 +167,7 @@ void	ConfigBase::add_index( std::string index )
 bool	ConfigBase::get_autoindex( void ) const		{ return _autoindex; }
 void	ConfigBase::set_autoindex( bool autoindex )	{
 	_autoindex = autoindex;
-	_inicializated[AUTOINDEX_INDEX] = false;
+	_inicializated[AUTOINDEX_INDEX] = true;
 }
 
 /*************/
