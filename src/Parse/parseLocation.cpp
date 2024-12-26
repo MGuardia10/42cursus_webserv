@@ -49,6 +49,8 @@ int	parse_location( std::ifstream &file, std::string &line, Server &server, std:
 			server.add_location( name_location, location );
 			break;
 		}
+		/* Case empty line or comment */
+		else if ( line.empty() || line.at(0) == '#' ) continue ;
 		/* Case valid directive on Location */
 		else if ( is_valid_directive( line ) && add_directive( line, server, location_directives ) ) continue;
 		/* Case error */
