@@ -45,5 +45,6 @@ void add_alias( std::string line, ConfigBase &item );
 /* checkDirectives.cpp */
 bool	is_valid_ipv4( std::string line );
 bool	is_valid_port( std::string line );
+bool    is_valid_absolute_path( std::string line );
 
 #include "parse.tpp"

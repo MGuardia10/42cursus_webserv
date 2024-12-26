@@ -9,6 +9,10 @@ void add_address( std::string line, ConfigBase &item ) {
 	/* normalize line without directive key and semicolon */
 	normalize_string( line );
 
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("address directive cannot be empty.");
+
 	if ( line.compare("localhost") == 0 )
 		server.set_ip( IP_DEFAULT );
 	else if ( is_valid_ipv4( line ) )
@@ -24,6 +28,10 @@ void add_listen( std::string line, ConfigBase &item ) {
 
 	/* normalize line without directive key and semicolon */
 	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("listen directive cannot be empty.");
 
 	/* Loop checking each port */
 	std::istringstream stream( line );
@@ -56,7 +64,7 @@ void add_server_name( std::string line, ConfigBase &item ) {
 
 	/* Check line is empty */
 	if ( line.empty() )
-		throw std::invalid_argument("Invalid name on server_name directive.");
+		throw std::invalid_argument("server_name directive cannot be empty.");
 
 	/* Set new server name */
 	server.set_server_name( line );
@@ -64,18 +72,44 @@ void add_server_name( std::string line, ConfigBase &item ) {
 }
 
 void add_root( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
+	
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("root directive cannot be empty.");
+	
+	/* Check line is an absolute path */
+	if ( !is_valid_absolute_path( line ) )
+		throw std::invalid_argument("Invalid root directive. Root must be one absolute path.");
+
+	line.at( line.size() - 1 ) != '/' ? item.set_root( line ) : item.set_root( line.substr( 0, line.size() - 1 ) );
+
 }
 
 void add_client_max_body_size( std::string line, ConfigBase &item ) { 
 	(void)line;
 	(void)item;
+
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("client_max_body_size directive cannot be empty.");
 }
 
 void add_error_page( std::string line, ConfigBase &item ) { 
 	(void)line;
 	(void)item;
+
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("error_page directive cannot be empty.");
 }
 
 void add_index( std::string line, ConfigBase &item ) { 
@@ -85,7 +119,7 @@ void add_index( std::string line, ConfigBase &item ) {
 
 	/* Check line is empty */
 	if ( line.empty() )
-		throw std::invalid_argument("Invalid file on index directive.");
+		throw std::invalid_argument("index directive cannot be empty.");
 
 	/* Loop index by index */
 	std::istringstream stream( line );
@@ -131,11 +165,25 @@ void add_autoindex( std::string line, ConfigBase &item ) {
 void add_cgi_pass( std::string line, ConfigBase &item ) { 
 	(void)line;
 	(void)item;
+
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("cgi_pass directive cannot be empty.");
 }
 
 void add_return( std::string line, ConfigBase &item ) { 
 	(void)line;
 	(void)item;
+
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("return directive cannot be empty.");
 }
 
 void add_methods( std::string line, ConfigBase &item ) { 
@@ -173,7 +221,22 @@ void add_methods( std::string line, ConfigBase &item ) {
 }
 
 void add_alias( std::string line, ConfigBase &item ) { 
-	/* Castear a location */
-	(void)line;
-	(void)item;
+	
+	/* Cast to location */
+	Location &location = static_cast<Location &>( item );
+
+	/* normalize line without directive key and semicolon */
+	normalize_string( line );
+
+	/* Check line is empty */
+	if ( line.empty() )
+		throw std::invalid_argument("alias directive cannot be empty.");
+
+	/* Check line is an absolute path */
+	if ( !is_valid_absolute_path( line ) )
+		throw std::invalid_argument("Invalid alias directive. Alias must be one absolute path.");
+
+	/* Push alias to location */
+	line.at( line.size() - 1 ) != '/' ? location.set_alias( line ) : location.set_alias( line.substr( 0, line.size() - 1 ) );
+
 }
