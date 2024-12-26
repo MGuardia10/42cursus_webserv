@@ -13,7 +13,8 @@ Client::Client( int fd, Server& server ):
 	_id(Client::CLIENTS_COUNT),
 	_fd(fd),
 	_server(server),
-	_cookie(generate_cookie())
+	_cookie(generate_cookie()),
+	_current_request(NULL)
 {
 	/* TODO: set the cookie */
 	Client::CLIENTS_COUNT++;
