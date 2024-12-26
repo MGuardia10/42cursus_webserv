@@ -163,8 +163,6 @@ void add_autoindex( std::string line, ConfigBase &item ) {
 }
 
 void add_cgi_pass( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
 
 	/* normalize line without directive key and semicolon */
 	normalize_string( line );
@@ -172,6 +170,32 @@ void add_cgi_pass( std::string line, ConfigBase &item ) {
 	/* Check line is empty */
 	if ( line.empty() )
 		throw std::invalid_argument("cgi_pass directive cannot be empty.");
+
+	/* Check line has valid extension and path */
+    std::istringstream stream( line );
+	std::string extension, path;
+
+	if ( std::getline( stream, extension, ' ' ) && std::getline( stream, path, ' ' ) ) {
+
+		/* Check valid file extension */
+		if ( extension.find_first_of( "./" ) != std::string::npos )
+			throw std::invalid_argument("Invalid cgi_pass directive. Invalid file extension.");
+
+		/* Check valid path to file */
+		if ( path.at(0) != '/' || path.at( path.size() - 1 ) == '/' )
+			throw std::invalid_argument("Invalid cgi_pass directive. Invalid path to binary.");
+
+		/* Add new CGI to item */
+		item.add_cgi( extension, path );
+
+		/* Check end of string */
+		if ( std::getline( stream, extension, ' ' ) )
+			throw std::invalid_argument("Invalid cgi_pass directive. CGI must contain exactly extension file and path to binary.");
+
+	}
+	else
+		throw std::invalid_argument("Invalid cgi_pass directive. CGI must contain exactly extension file and path to binary.");
+
 }
 
 void add_return( std::string line, ConfigBase &item ) { 
