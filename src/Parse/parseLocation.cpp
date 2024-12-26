@@ -52,7 +52,7 @@ int	parse_location( std::ifstream &file, std::string &line, Server &server, std:
 		/* Case empty line or comment */
 		else if ( line.empty() || line.at(0) == '#' ) continue ;
 		/* Case valid directive on Location */
-		else if ( is_valid_directive( line ) && add_directive( line, server, location_directives ) ) continue;
+		else if ( is_valid_directive( line ) && add_directive( line, location, location_directives ) ) continue;
 		/* Case error */
 		else return 0;
 	}
