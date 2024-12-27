@@ -43,7 +43,7 @@ void	parse_server( std::vector<Server> &servers, std::ifstream &file, std::strin
 
 		/* Case EOF without reaching end bracket */
 		if ( file.eof() )
-			throw std::invalid_argument("Error while parsing configuration file.");
+			throw std::invalid_argument("Error while parsing configuration file. Check brackets are properly closed");
 		
 		/* Case empty line or comment in a Server */
 		if ( line.empty() || line.at(0) == '#' ) continue ;
@@ -54,6 +54,6 @@ void	parse_server( std::vector<Server> &servers, std::ifstream &file, std::strin
 		else if ( is_location( line ) && parse_location( file, line, server, location_directives ) ) continue ;
 		/* Case Syntax error found */
 		else
-			throw std::invalid_argument("Error while parsing configuration file.");
+			throw std::invalid_argument("Error while parsing configuration file. Syntax error.");
 	}
 }

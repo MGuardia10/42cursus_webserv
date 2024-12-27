@@ -6,7 +6,10 @@ int add_directive( std::string const line, T &item, std::map<std::string, Functi
 
 	/* Find directive on directives map */
 	std::map<std::string, Function>::const_iterator it = directives_map.find( key );
-	if ( it == directives_map.end() ) return 0;
+	if ( it == directives_map.end() ) {
+		normalize_string( key );
+		throw std::invalid_argument("Error while parsing configuration file. Invalid directive name [" + key + "]." );
+	}
 
 	/* Execute function associate with the key found */
 	it->second( line.substr( key.size(), line.size() - key.size() - 1 ) , item );

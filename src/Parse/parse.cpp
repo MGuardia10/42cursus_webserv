@@ -67,7 +67,7 @@ std::vector<Server>	parse( std::string const& filename )
 			/* Case lines between Servers */
 			if ( !line.empty() && line_after_server ) {
 				if ( line.at(0) != '#' )
-					throw std::invalid_argument("Error while parsing configuration file.");
+					throw std::invalid_argument("Error while parsing configuration file. Check lines between servers.");
 			}
 		}
 	}

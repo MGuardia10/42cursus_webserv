@@ -18,7 +18,7 @@ void add_address( std::string line, ConfigBase &item ) {
 	else if ( is_valid_ipv4( line ) )
 		server.set_ip( line );
 	else
-		throw std::invalid_argument("Invalid IPv4 on address directive.");
+		throw std::invalid_argument("Invalid address directive. Address must be a valid IPv4.");
 }
 
 void add_listen( std::string line, ConfigBase &item ) { 
@@ -49,7 +49,7 @@ void add_listen( std::string line, ConfigBase &item ) {
 			server.add_port( static_cast<int>(port) );
 
 		} else
-			throw std::invalid_argument("Invalid port on listen directive.");
+			throw std::invalid_argument("Invalid listen directive. Port must be a number between 0 to 65535.");
 	}
 	
 }
@@ -204,9 +204,9 @@ void add_index( std::string line, ConfigBase &item ) {
 		
 		/* Discard absolute paths and directories */
 		if ( indexStr.at( 0 ) == '/' )
-			throw std::invalid_argument("Invalid file on index directive. Index cannot be an absolute path.");
+			throw std::invalid_argument("Invalid index directive. Index cannot be an absolute path.");
 		if ( indexStr.at( indexStr.size() - 1 ) == '/' )
-			throw std::invalid_argument("Invalid file on index directive. Index cannot be a directory.");
+			throw std::invalid_argument("Invalid index directive. Index cannot be a directory.");
 		
 		/* Add index to item */
 		item.add_index( indexStr );
@@ -220,7 +220,7 @@ void add_autoindex( std::string line, ConfigBase &item ) {
 
 	/* Check line is empty */
 	if ( line.empty() )
-		throw std::invalid_argument("Invalid value on autoindex directive. Accepted values are [ true, false ].");
+		throw std::invalid_argument("autoindex directive cannot be empty.");
 
 	/* Convert all chars to lowercase */
     std::string lowerCaseLine;
@@ -234,7 +234,7 @@ void add_autoindex( std::string line, ConfigBase &item ) {
 	else if ( lowerCaseLine.compare( "false" ) == 0 )
 		item.set_autoindex( false );
 	else
-		throw std::invalid_argument("Invalid value on autoindex directive. Accepted values are [ true, false ].");
+		throw std::invalid_argument("Invalid autoindex directive. Accepted values are [ true, false ].");
 }
 
 void add_cgi_pass( std::string line, ConfigBase &item ) { 
@@ -317,7 +317,7 @@ void add_methods( std::string line, ConfigBase &item ) {
 
 	/* Check line is empty */
 	if ( line.empty() )
-		throw std::invalid_argument("No method found on methods directive.");
+		throw std::invalid_argument("methods directive cannot be empty.");
 
 	/* Valid methods for our Server */
 	std::set<std::string> validMethods;
@@ -337,7 +337,7 @@ void add_methods( std::string line, ConfigBase &item ) {
 	while ( std::getline( stream, methodStr, ' ' ) ) {
 
 		if ( validMethods.find( methodStr ) == validMethods.end() )
-			throw std::invalid_argument("Invalid method on methods directive. Accepted methods are [ GET, POST, DELETE ].");
+			throw std::invalid_argument("Invalid methods directive. Accepted methods are [ GET, POST, DELETE ].");
 
 		/* Case valid method is found, push to server */
 		item.add_method( methodStr );
