@@ -47,5 +47,6 @@ bool	is_valid_ipv4( std::string line );
 bool	is_valid_port( std::string line );
 bool    is_valid_absolute_path( std::string line );
 int		http_code( std::string line );
+bool	is_valid_url_or_path(const std::string line);
 
 #include "parse.tpp"

@@ -88,21 +88,61 @@ void add_root( std::string line, ConfigBase &item ) {
 
 }
 
-void add_client_max_body_size( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
-
+void add_client_max_body_size( std::string line, ConfigBase &item ) {
+	
 	/* normalize line without directive key and semicolon */
 	normalize_string( line );
 
-	/* Check line is empty */
-	if ( line.empty() )
-		throw std::invalid_argument("client_max_body_size directive cannot be empty.");
+	/* Check line is empty or line starts with "-" */
+	if ( line.empty() || line.at(0) == '-' )
+		throw std::invalid_argument("client_max_body_size directive cannot be empty or a negative number.");
+
+	/* Get bytes from line and endptr */
+	char* endptr;
+    size_t bytes = strtoul( line.c_str(), &endptr, 10 );
+
+	/* Convert endptr to std::string */
+	std::string suffix( endptr );
+
+	/* If no suffix, add bytes and return */
+	if ( suffix.size() == 0 ) {
+		item.set_client_max_size( bytes );
+		return ;
+	}
+
+	/* Case invalid suffix */
+	if ( suffix.size() != 1 )
+		throw std::invalid_argument("Invalid client_max_body_size directive. Accepted suffix are [ k, K, m, M, g, G ].");
+
+	/* Multiply bytes based on suffix */
+	size_t total;
+	switch ( std::tolower( suffix[0] ) ) {
+	
+	case 'k':
+		/* Case Kilobytes */
+		total = bytes * 1024;
+		break;
+
+	case 'm':
+		/* Case Megabytes */
+		total = bytes * 1024 * 1024;
+		break;
+
+	case 'g':
+		/* Case Gigabytes */
+		total = bytes * 1024 * 1024 * 1024;
+		break;
+	
+	default:
+		throw std::invalid_argument("Invalid client_max_body_size directive. Accepted suffix are [ k, K, m, M, g, G ].");
+	}
+
+	/* Set client_max_body_size */
+	item.set_client_max_size( total );
+
 }
 
 void add_error_page( std::string line, ConfigBase &item ) { 
-	(void)line;
-	(void)item;
 
 	/* normalize line without directive key and semicolon */
 	normalize_string( line );
@@ -110,6 +150,41 @@ void add_error_page( std::string line, ConfigBase &item ) {
 	/* Check line is empty */
 	if ( line.empty() )
 		throw std::invalid_argument("error_page directive cannot be empty.");
+
+	/* Check line has valid code and file */
+	std::istringstream stream( line );
+	std::string token;
+
+	std::vector<int> codes;
+	std::string redirect;
+
+	while ( stream >> token ) {
+
+		/* Check is valid code */
+		int code;
+		if ( ( code = http_code( token ) ) != -1 && code >= 300 && code <= 599 ) {
+			/* valid code found */
+			codes.push_back( code );
+
+		} else if ( is_valid_url_or_path( token ) ) {
+			/* Keep redirect string */
+			redirect = token;
+			
+			/* Exit loop */
+			break;
+
+		} else
+			throw std::invalid_argument("Invalid error_page directive. Format must follow: error_page [error_codes (300 - 599)] [path | URL];");
+	}
+
+	/* Check codes, redirect and nothing to read behind */
+	if ( codes.empty() || redirect.empty() || stream >> token )
+		throw std::invalid_argument("Invalid error_page directive. Format must follow: error_page [error_codes (300 - 599)] [path | URL];");
+
+	/* Push codes and redirect to item */
+	for ( std::vector<int>::iterator it = codes.begin(); it != codes.end(); ++it ) {
+		item.add_error_page( *it , redirect );
+	}
 }
 
 void add_index( std::string line, ConfigBase &item ) { 

@@ -30,7 +30,6 @@ bool	is_valid_ipv4( std::string line ) {
     }
 
 	return true;
-
 }
 
 bool	is_valid_port( std::string line ) {
@@ -59,4 +58,8 @@ int http_code( std::string line ) {
 
     return (!*endptr && (code >= 100 && code <= 599) ) ? code : -1;
 
+}
+
+bool is_valid_url_or_path(const std::string line) {
+    return !line.empty() && ((line[0] == '/' && line[line.size() - 1] != '/' ) || line.substr(0, 4) == "http");
 }
