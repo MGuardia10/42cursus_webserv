@@ -40,15 +40,10 @@ HTTPRequest::HTTPRequest( void ) :
 	ss << HTTPRequest::REQUESTS_COUNT++;
 	_body_filename = "/tmp/outngnx_request_" + ss.str();
 	_file.open(_body_filename.c_str(), std::ios::binary);
-
-	/* Applied the methods */
-	// save_request(connection);
 }
 
 HTTPRequest::~HTTPRequest( void )
-{
-	// remove(_body_filename.c_str());
-}
+{}
 
 /*==========*/
 /* !SECTION */
@@ -59,10 +54,38 @@ HTTPRequest::~HTTPRequest( void )
 /***********************/
 /* NOTE: '<<' operator */
 /***********************/
+
+std::string	HTTPRequest::print( void ) const
+{
+	std::string buffer = "";
+
+	/* First line info */
+	buffer += "[ REQUEST ]\n";
+	buffer += "\t- Method: \"" + _method + "\"\n";
+	buffer += "\t- Path: \"" + _path + "\"\n";
+	buffer += "\t- Protocol: \"" + _protocol + "\"\n";
+
+	/* Headers */
+	buffer += "\t- Headers: ";
+	if (_headers.size() == 0)
+		buffer += "None";
+	buffer += "\n";
+	for (std::map<std::string, std::string>::const_iterator it = _headers.begin(); it != _headers.end(); it++)
+		buffer += "\t\t+ " + it->first + "=" + it->second + "\n";
+	
+	/* Information about the body file */
+	buffer += "\t- Body file path: \"" + _body_filename + "\"\n";
+
+	/* Information about the request status */
+	buffer += "\t- Request finished: " + (_is_finished ? std::string("Yes\n") : std::string("No\n"));
+	buffer += "\t- Connection closed: " + (_is_closed ? std::string("Yes\n") : std::string("No\n"));
+
+	return buffer;
+}
+
 std::ostream&	operator<<( std::ostream& os, HTTPRequest const& printObject )
 {
-	/* TODO */
-	(void) printObject;
+	os << printObject.print();
 	return (os);
 };
 
@@ -183,7 +206,6 @@ void	HTTPRequest::process_request( int fd )
 	std::string body_string;	/* Aux variable to have the body as string */
 
 	/* Loop */
-	std::cout << std::endl;	/* DEBUGGING: */
 	while (_content_length != 0)
 	{
 		/* Received the request and save it correctly */
@@ -310,7 +332,7 @@ void	HTTPRequest::process_request( int fd )
 void	HTTPRequest::move_body_file(std::string const& dest_path)
 {
 	/* Check if there is any file */
-	if (_body_filename == "")
+	if (_body_filename != "")
 	{	
 		/* Remove the dest file */
 		remove(dest_path.c_str());

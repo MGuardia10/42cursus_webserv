@@ -80,6 +80,8 @@ class HTTPRequest
 		void	move_body_file(std::string const& dest);
 		void	remove_body_file( void );
 
+		std::string	print( void ) const;
+
 		/* NOTE: Exceptions */
 
 };
