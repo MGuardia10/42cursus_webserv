@@ -79,6 +79,8 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	if (!request->check_finished())
 		return false;
 
+	std::cout << *request << std::endl;
+
 	if (request->check_closed())
 	{
 		delete request;
