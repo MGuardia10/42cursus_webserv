@@ -1,6 +1,7 @@
 #include "../../include/HTTPRequest.hpp"
 #include "../../include/signals.hpp"
 #include <sys/socket.h>
+#include <cstdio>
 #include <cstdlib>
 #include <sstream>
 #include <unistd.h>
@@ -77,6 +78,7 @@ std::string	HTTPRequest::get_protocol( void ) const { return _protocol; }
 std::map<std::string, std::string>	HTTPRequest::get_headers( void ) const { return _headers; }
 bool		HTTPRequest::check_closed( void ) const { return _is_closed; }
 bool		HTTPRequest::check_finished( void ) const { return _is_finished; }
+std::string	HTTPRequest::get_filename( void ) const { return _body_filename; }
 
 std::pair<bool, std::string>	HTTPRequest::find_header( std::string header ) const
 {
@@ -133,7 +135,6 @@ void	HTTPRequest::parse_headers(std::string headers)
 			));
 		}
 	}
-	// std::cout << "=> End header parser" << std::endl;
 }
 
 /**
@@ -215,6 +216,12 @@ void	HTTPRequest::process_request( int fd )
 			/* Search the body */
 			_boundary = get_boundary( _headers );
 			_content_length = get_content_length( _headers );
+			if (!_content_length)
+			{
+				_file.close();
+				remove(_body_filename.c_str());
+				_body_filename = "";
+			}
 
 			/* Save the rest of the request on the body vector */
 			if (_content_length && _request.size() > headers_size + 4)
@@ -286,6 +293,40 @@ void	HTTPRequest::process_request( int fd )
 	}
 
 	_is_finished = (_content_length == 0 || (_boundary != "" && _content_length - _boundary.size() - 6 == 0));
+
+	/* Last process details */
+	if (_is_finished)
+	{
+		/* Close the body file */
+		if (_file.is_open())
+			_file.close();
+		
+		/* Change names */
+		if (_request_filename != "")
+			move_body_file("/tmp/" + _request_filename);
+	}
+}
+
+void	HTTPRequest::move_body_file(std::string const& dest_path)
+{
+	/* Check if there is any file */
+	if (_body_filename == "")
+	{	
+		/* Remove the dest file */
+		remove(dest_path.c_str());
+
+		/* Change the name of out current file */
+		std::rename(_body_filename.c_str(), dest_path.c_str());
+
+		/* Save the new name */
+		_body_filename = dest_path;
+	}
+}
+
+void	HTTPRequest::remove_body_file( void )
+{
+	if (_body_filename != "")
+		remove(_body_filename.c_str());
 }
 
 /*==========*/

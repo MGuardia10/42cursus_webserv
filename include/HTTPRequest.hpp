@@ -72,9 +72,13 @@ class HTTPRequest
 
 		bool		check_closed( void ) const;
 		bool		check_finished( void ) const;
+		std::string	get_filename( void ) const;
 
 		/* NOTE: Objects features */
 		void	process_request( int fd );
+
+		void	move_body_file(std::string const& dest);
+		void	remove_body_file( void );
 
 		/* NOTE: Exceptions */
 
