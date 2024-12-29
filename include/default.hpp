@@ -1,7 +1,7 @@
 #pragma once
 
 /* TODO: Defaults error_page's */
-# define ERROR_PAGE_DEFAULT	NULL
+# define ERROR_PAGE_DEFAULT				NULL
 
 /* Default max size of a HTTP request -> 100 bytes/characters */
 # define CLIENT_MAX_BODY_SIZE_DEFAULT	100
@@ -16,4 +16,7 @@
 # define AUTOINDEX_DEFAULT				false
 
 /* Default server IP */
-# define IP_DEFAULT	"127.0.0.1"
+# define IP_DEFAULT						"127.0.0.1"
+
+/* Limit for client_max_body_size - 50mb */
+# define MAX_BODY_SIZE_BYTES			52428800

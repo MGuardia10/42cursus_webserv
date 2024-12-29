@@ -44,4 +44,22 @@ bool	is_valid_port( std::string line ) {
 
     /* Return is port between 0 and 65535 */
     return !( *endptr != '\0' || port < 0 || port > 65535 );
+
+}
+
+bool    is_valid_absolute_path( std::string line ) {
+    return line.at(0) == '/' && line.find( ' ' ) == std::string::npos;
+}
+
+int http_code( std::string line ) {
+
+    char *endptr;
+    int code = std::strtol( line.c_str(), &endptr, 10);
+
+    return (!*endptr && (code >= 100 && code <= 599) ) ? code : -1;
+
+}
+
+bool is_valid_url_or_path(const std::string line) {
+    return !line.empty() && ((line[0] == '/' && line[line.size() - 1] != '/' ) || line.substr(0, 4) == "http");
 }
