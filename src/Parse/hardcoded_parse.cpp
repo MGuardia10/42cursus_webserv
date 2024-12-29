@@ -13,8 +13,8 @@ static std::vector<Server> hardcodedServers( void )
 	s1.add_port(8081);
 	s1.set_server_name("Test");
 
-	s1.add_error_page(400, "/400.html");
-	s1.add_error_page(404, "/404.html");
+	s1.add_error_page(400, "400.html");
+	s1.add_error_page(404, "404.html");
 
 	s1.set_client_max_size(1000);
 
@@ -57,7 +57,7 @@ static std::vector<Server> hardcodedServers( void )
 	s2.set_client_max_size(1000);
 
 	Location l1s2 = Location("/");
-	l1s2.set_root("/pages");
+	l1s2.set_root("pages");
 	l1s2.add_index("index.html");
 	s2.add_location(l1s2.get_route(), l1s2);
 

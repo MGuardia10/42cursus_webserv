@@ -16,19 +16,21 @@ VPATH =	include/:		\
 		src/:			\
 		src/Main/:		\
 		src/Parse:		\
-		src/Server/:
+		src/Server/:	\
+		src/HTTPRequestResponse/:
 OBJ_FOLDER=obj
 
 # NOTE: Headers
 HEADERS=	ConfigBase.hpp	\
 			Location.hpp	\
 			Server.hpp		\
-			Client.hpp
+			Client.hpp		\
+			HTTPRequest.hpp
 
 # NOTE: Source files
 MAIN_SRC =	main.cpp		\
 			signals.cpp		\
-			processRequests.cpp
+			process_requests.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 PARSE_SRC =	hardcoded_parse.cpp
@@ -39,6 +41,9 @@ SERVER_SRC =	ConfigBase.cpp	\
 				Server.cpp		\
 				Client.cpp
 OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
+HTTPREQUESTRESPONSE_SRC =	HTTPRequest.cpp
+OBJ += $(HTTPREQUESTRESPONSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 #####################################################################################################################
 

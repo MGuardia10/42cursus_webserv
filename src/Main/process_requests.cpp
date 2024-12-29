@@ -1,6 +1,8 @@
-#include "../../include/processRequests.hpp"
+#include "../../include/process_requests.hpp"
 #include "../../include/Client.hpp"
 #include "../../include/signals.hpp"
+#include "../../include/colors.hpp"
+#include "../../include/HTTPRequest.hpp"
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -9,7 +11,8 @@
 #include <string.h>
 #include <algorithm>
 #include <unistd.h>
-#include "../../include/colors.hpp"
+#include <fcntl.h>
+
 
 /**
  * @brief Funtion to save the new servers connections
@@ -27,11 +30,14 @@ bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::map<int
 	if (server_it == servers.end())
 		return false;
 
-
 	/* New connection */
 	int new_connection = accept(fd, NULL, NULL);
 	std::cout << GREEN << "[ NEW CONNECTION ]" << RESET << " New client: " << new_connection << std::endl;
-	
+
+	/* Make the connection non blocking */
+	int flags = fcntl(new_connection, F_GETFL, 0);
+	fcntl(new_connection, F_SETFL, flags | O_NONBLOCK);
+
 	/* Creation of the client to save the info */
 	Client new_client = Client(new_connection, server_it->second);
 	std::cout << new_client << std::endl;
@@ -63,48 +69,50 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return false;
 	std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd;
 
-	/* SECTION: fast implementation to read all the request */
-	char buffer[1025];
-	std::string header = "";
-	size_t	headers_end = std::string::npos;
-	int bytes_received;
-
-	while (headers_end == std::string::npos)
+	HTTPRequest*	request = client_it->second.get_request();
+	if (!request)
 	{
-		bytes_received = recv(fd, buffer, 1024, 0);
-
-		/* Check if the connection has to be closed */
-		if (bytes_received == 0)
-		{
-			std::cout <<std::endl << RED"[ CLOSED CONNECTION ]" << RESET << " The connection with " << fd << " has been closed" << std::endl;
-			clients.erase(client_it);
-			close(fd);
-			return true;
-		}
-
-		buffer[bytes_received] = '\0';
-		header += buffer;
-
-		headers_end = header.find("\r\n\r\n");
+		request = new HTTPRequest();
+		client_it->second.set_request(request);
 	}
-	
-	std::cout << ". Header:\n--------------------------\n" << header << std::endl;
-	std::cout << "--------------------------" << std::endl;
+	request->process_request( fd );
+	if (!request->check_finished())
+		return false;
 
+	std::cout << *request << std::endl;
+
+	if (request->check_closed())
+	{
+		delete request;
+		std::cout <<std::endl << RED"[ CLOSED CONNECTION ]" << RESET << " The connection with " << fd << " has been closed" << std::endl;
+		clients.erase(client_it);
+		close(fd);
+		return true;
+	}
+
+	/* Delete the request data */
+	/* FIXME: the information to check on the request has to be checked previously */
+	delete request;
+	client_it->second.set_request(NULL);
+
+	std::cout << "Preparing response" << std::endl;
 	std::string response =
 		"HTTP/1.1 200 OK\r\n"
 		"Content-Type: text/html\r\n"
 		// "Connection: keep-alive\r\n"
 		"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
-		"Content-Length: 13\r\n"
+		"Content-Length: 210\r\n"
+		// "Content-Length: 179\r\n"
 		"\r\n"
-		"Hello World!\n";
+		"<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
+		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
 	send(fd, response.c_str(), response.size(), 0);
+	std::cout << "Response sent" << std::endl;
 	/* !SECTION */
 	return false;
 }
 
-void	processRequests(std::vector<Server> servers_vector)
+void	process_requests(std::vector<Server> servers_vector)
 {
 	/* Storage variables */
 	std::map<int, Server> servers;

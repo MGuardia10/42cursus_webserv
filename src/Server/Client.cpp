@@ -13,7 +13,8 @@ Client::Client( int fd, Server& server ):
 	_id(Client::CLIENTS_COUNT),
 	_fd(fd),
 	_server(server),
-	_cookie(generate_cookie())
+	_cookie(generate_cookie()),
+	_current_request(NULL)
 {
 	/* TODO: set the cookie */
 	Client::CLIENTS_COUNT++;
@@ -44,6 +45,7 @@ std::string Client::print( void ) const
 	buffer += "\t- Connection fd: " + ss.str() + "\n";
 	buffer += "\t- Associated server: " + _server.get_server_name() + "\n";
 	buffer += "\t- Cookie: " + _cookie + "\n";
+	buffer += "\t- Pending request: " + (_current_request ? std::string("Yes") : std::string("No")) + "\n";
 
 	return buffer;
 }
@@ -63,6 +65,9 @@ std::ostream&	operator<<( std::ostream& os, Client const& printObject )
 int Client::get_fd( void ) const { return _fd; }
 Server const& Client::get_server( void ) const { return _server; }
 std::string Client::get_cookie( void ) const { return _cookie; }
+
+HTTPRequest*	Client::get_request( void ) const { return _current_request; }
+void			Client::set_request( HTTPRequest* request ) { _current_request = request; }
 
 /*==========*/
 /* !SECTION */

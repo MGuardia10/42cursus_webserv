@@ -2,14 +2,16 @@
 
 # include <iostream>
 # include "Server.hpp"
+# include "HTTPRequest.hpp"
 
 class Client
 {
 	private:
-		int	const _id;				/* Client id */
-		int const _fd;				/* Connection fd */
-		Server const& _server;		/* Associated server */
-		std::string const _cookie;	/* Session cookie */
+		int	const _id;					/* Client id */
+		int const _fd;					/* Connection fd */
+		Server const& _server;			/* Associated server */
+		std::string const _cookie;		/* Session cookie */
+		HTTPRequest *_current_request;	/* Last request */
 
 		static int CLIENTS_COUNT;	/* Client generated, used on cookies*/
 
@@ -24,6 +26,9 @@ class Client
 		int	get_fd( void ) const;
 		Server const& get_server( void ) const;
 		std::string get_cookie( void ) const;
+
+		HTTPRequest*	get_request( void ) const;
+		void			set_request( HTTPRequest* request );
 
 		/* NOTE: Objects features */
 		std::string print( void ) const;
