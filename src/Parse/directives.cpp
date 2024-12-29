@@ -1,13 +1,12 @@
 #include "../../include/parse.hpp"
 #include <set>
+#include <climits>
+#include <cerrno>
 
 void add_address( std::string line, ConfigBase &item ) {
 	
 	/* Cast to Server */
 	Server &server = static_cast<Server &>( item );
-
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -25,9 +24,6 @@ void add_listen( std::string line, ConfigBase &item ) {
 	
 	/* Cast to Server */
 	Server &server = static_cast<Server &>( item );
-
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -59,9 +55,6 @@ void add_server_name( std::string line, ConfigBase &item ) {
 	/* Cast to Server */
 	Server &server = static_cast<Server &>( item );
 
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
-
 	/* Check line is empty */
 	if ( line.empty() )
 		throw std::invalid_argument("server_name directive cannot be empty.");
@@ -72,9 +65,6 @@ void add_server_name( std::string line, ConfigBase &item ) {
 }
 
 void add_root( std::string line, ConfigBase &item ) { 
-	
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -89,9 +79,6 @@ void add_root( std::string line, ConfigBase &item ) {
 }
 
 void add_client_max_body_size( std::string line, ConfigBase &item ) {
-	
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty or line starts with "-" */
 	if ( line.empty() || line.at(0) == '-' )
@@ -101,11 +88,20 @@ void add_client_max_body_size( std::string line, ConfigBase &item ) {
 	char* endptr;
     size_t bytes = strtoul( line.c_str(), &endptr, 10 );
 
+	/* Check if the value is too large for unsigned long */
+	if (bytes == ULONG_MAX && errno == ERANGE)
+		throw std::invalid_argument("client_max_body_size value is too large.");
+
 	/* Convert endptr to std::string */
 	std::string suffix( endptr );
 
 	/* If no suffix, add bytes and return */
 	if ( suffix.size() == 0 ) {
+
+		/* Check limit for 50 MB */
+		if ( bytes > MAX_BODY_SIZE_BYTES )
+			throw std::invalid_argument("client_max_body_size exceeds the maximum limit of 50 MB.");
+		
 		item.set_client_max_size( bytes );
 		return ;
 	}
@@ -115,27 +111,38 @@ void add_client_max_body_size( std::string line, ConfigBase &item ) {
 		throw std::invalid_argument("Invalid client_max_body_size directive. Accepted suffix are [ k, K, m, M, g, G ].");
 
 	/* Multiply bytes based on suffix */
-	size_t total;
+	size_t multiplier = 0;
 	switch ( std::tolower( suffix[0] ) ) {
 	
 	case 'k':
 		/* Case Kilobytes */
-		total = bytes * 1024;
+		multiplier = 1024;
 		break;
 
 	case 'm':
 		/* Case Megabytes */
-		total = bytes * 1024 * 1024;
+		multiplier = 1024 * 1024;
 		break;
 
 	case 'g':
 		/* Case Gigabytes */
-		total = bytes * 1024 * 1024 * 1024;
+		multiplier = 1024 * 1024 * 1024;
 		break;
 	
 	default:
 		throw std::invalid_argument("Invalid client_max_body_size directive. Accepted suffix are [ k, K, m, M, g, G ].");
 	}
+
+	/* Protect overflow cases */
+    if ( bytes > ULONG_MAX / multiplier ) {
+        throw std::invalid_argument("client_max_body_size value causes overflow.");
+    }
+
+	size_t total = bytes * multiplier;
+
+	/* Check limit for 50 MB for total */
+	if ( total > MAX_BODY_SIZE_BYTES )
+		throw std::invalid_argument("client_max_body_size exceeds the maximum limit of 50 MB.");
 
 	/* Set client_max_body_size */
 	item.set_client_max_size( total );
@@ -143,9 +150,6 @@ void add_client_max_body_size( std::string line, ConfigBase &item ) {
 }
 
 void add_error_page( std::string line, ConfigBase &item ) { 
-
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -188,9 +192,6 @@ void add_error_page( std::string line, ConfigBase &item ) {
 }
 
 void add_index( std::string line, ConfigBase &item ) { 
-	
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -214,9 +215,6 @@ void add_index( std::string line, ConfigBase &item ) {
 }
 
 void add_autoindex( std::string line, ConfigBase &item ) { 
-	
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -238,9 +236,6 @@ void add_autoindex( std::string line, ConfigBase &item ) {
 }
 
 void add_cgi_pass( std::string line, ConfigBase &item ) { 
-
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -274,9 +269,6 @@ void add_cgi_pass( std::string line, ConfigBase &item ) {
 }
 
 void add_return( std::string line, ConfigBase &item ) { 
-	
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -310,10 +302,7 @@ void add_return( std::string line, ConfigBase &item ) {
 	
 }
 
-void add_methods( std::string line, ConfigBase &item ) { 
-	
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
+void add_methods( std::string line, ConfigBase &item ) {
 
 	/* Check line is empty */
 	if ( line.empty() )
@@ -348,9 +337,6 @@ void add_alias( std::string line, ConfigBase &item ) {
 	
 	/* Cast to location */
 	Location &location = static_cast<Location &>( item );
-
-	/* normalize line without directive key and semicolon */
-	normalize_string( line );
 
 	/* Check line is empty */
 	if ( line.empty() )
