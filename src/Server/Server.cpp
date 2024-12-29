@@ -62,6 +62,8 @@ std::string	Server::print( void ) const
 
 	buffer += "[ SERVER ] " + _server_name + "\n";
 
+	buffer += "\t· Address: " + _ip + "\n";
+
 	buffer += "\t· Is running: " + (_is_running ? std::string("true") : std::string("false")) + "\n";
 
 	buffer += "\t· Connections: ";
@@ -74,6 +76,8 @@ std::string	Server::print( void ) const
 		ss << *it;
 		buffer += "\t\t- " + ss.str() + "\n";
 	}
+
+	buffer += static_cast<ConfigBase const&>(*this).print();
 
 	buffer += "\t· Locations:\n\n";
 	for (std::map<std::string, Location>::const_iterator it = _locations.begin(); it != _locations.end(); it++)

@@ -1,6 +1,5 @@
 #pragma once
 
-/* Colors */
 #define RESET   "\033[0m"
 #define BLACK 	"\e[1;90m"
 #define RED 	"\e[1;91m"
