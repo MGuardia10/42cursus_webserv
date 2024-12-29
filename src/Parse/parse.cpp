@@ -1,24 +1,24 @@
 #include "../../include/parse.hpp"
+#include "../../include/colors.hpp"
 
-void normalizeString(std::string& str) {
+void normalize_string(std::string& str) {
     std::string result;
     bool inSpace = false;
 
+	/* Remove spaces between words */
     for (size_t i = 0; i < str.size(); ++i) {
         if (std::isspace(str[i])) {
             if (!inSpace) {
-                // Añade un único espacio si no estabas en una secuencia de espacios
                 result += ' ';
                 inSpace = true;
             }
         } else {
-            // Añade caracteres no espacio y reinicia el estado
             result += str[i];
             inSpace = false;
         }
     }
 
-    // Eliminar espacios al principio y al final
+    /* Remove spaces at start and end of line */
     size_t start = 0;
 	size_t end = result.size();
 
@@ -29,7 +29,6 @@ void normalizeString(std::string& str) {
     str = result;
 }
 
-
 std::vector<Server>	parse( std::string const& filename )
 {
 	std::vector<Server> servers;
@@ -37,62 +36,53 @@ std::vector<Server>	parse( std::string const& filename )
 
 	servers.clear();
 
-    // Comprobar si el archivo existe y es accesible (? no me funcionan los permisos debo ser superuser)
-
-	// struct stat fileInfo; // #include <sys/stat.h>
-    // if (stat(filename.c_str(), &fileInfo) != 0) {
-    //     std::cerr << "Error: No se puede acceder al archivo o no existe." << std::endl;
-    //     return servers;
-    // }
-
+	/* Check file is open */
 	if ( !file.is_open() ) {
 		std::cerr << "Error opening file: " << filename << '\n';
         return servers;
 	}
 
-	std::string line;
-    while (std::getline(file, line)) {
+	try
+	{
+		std::string line;
+		bool line_after_server = true;
 
-		/* Normalizar espacios/tabulaciones entre palabras, al principio y al final de la linea */
-		normalizeString( line );
+		/* Get server/location directives in a map */
+		std::map<std::string, Function> server_directives = get_server_directives();
+		std::map<std::string, Function> location_directives = get_location_directives();
 
-		/* Saltar siguiente linea si la linea ha quedado vacia o es comentario */
-		if ( line.empty() || line.at(0) == '#' )
-			continue ;
+		while (std::getline(file, line)) {
 
-		/* Parseo de servidores */
-		if (line.compare("server {") == 0) {
+			/* Normalize spaces/tabs at start/end of line and between words */
+			normalize_string( line );
 
-			/* Verificar sintaxis separando por servers, actualizando file!!!!! */
-			while (line.compare("server {") == 0) {
-				/* Llegados a este punto estamos dentro de un server */
-				std::string buffer = "";
+			/* Case line is empty or is a comment */
+			if ( line.empty() || line.at(0) == '#' )
+				continue ;
 
-				/* 1. Checkear sintaxis guardando archivo en un buffer linea a linea, hasta llegar a EOF o "server {" */
-				/* 2. Si sintaxis OK, proceder a creación de server. Si sintaxis KO, limpiar servers y devolver servers vacio */
-				// if ( valid_sintax(file, line, buffer) ) {
-				// 	servers.push_back( create_server( buffer ) );
-				// 	buffer.clear();
-				// }
-				// else if ( file.eof() ) // comprobar este caso, no estoy seguro de como funciona eof
-				// 	continue ;
-				// else {
-				// 	servers.clear();
-				// 	return servers;
-				// }
+			/* Case line is the start of a Server */
+			while (line.compare("server {") == 0)
+				parse_server( servers, file, line, server_directives, location_directives, line_after_server );
+
+			/* Case lines between Servers */
+			if ( !line.empty() && line_after_server ) {
+				if ( line.at(0) != '#' )
+					throw std::invalid_argument("Error while parsing configuration file. Check lines between servers.");
 			}
 		}
-		else {
-			servers.clear();
-			return servers;
-		}
+	}
+	catch( const std::exception& e )
+	{
+		/* Clear servers vector */
+		servers.clear();
 
-        std::cout << line << std::endl;
-    }
-
-	/* Close file */
+		/* Print error on stderror */
+		std::cerr << RED << "[ ERROR ] " << filename << ": " << e.what() << RESET << '\n';
+	}
+	
+	/* Close config file */
 	file.close();
 
-	/* Return servers vector containing all servers added on config file */
+	/* Return Servers Vector */
 	return servers;
 }

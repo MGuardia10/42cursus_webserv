@@ -128,8 +128,12 @@ std::string					ConfigBase::get_error_page( int code ) const
 }
 void						ConfigBase::add_error_page( int code, std::string path )
 {
-	if (_error_pages.find(code) == _error_pages.end())
+	std::map<int, std::string>::iterator it = _error_pages.find(code);
+
+	if (it == _error_pages.end())
 		_error_pages.insert(std::pair<int, std::string>(code, path));
+	else
+		it->second = path;
 }
 
 /*************************/
@@ -167,7 +171,7 @@ void	ConfigBase::add_index( std::string index )
 bool	ConfigBase::get_autoindex( void ) const		{ return _autoindex; }
 void	ConfigBase::set_autoindex( bool autoindex )	{
 	_autoindex = autoindex;
-	_inicializated[AUTOINDEX_INDEX] = false;
+	_inicializated[AUTOINDEX_INDEX] = true;
 }
 
 /*************/
@@ -181,8 +185,12 @@ std::string							ConfigBase::get_cgi( std::string extension ) const
 }
 void								ConfigBase::add_cgi( std::string extension, std::string path )
 {
-	if (_cgi.find(extension) == _cgi.end())
+	std::map<std::string, std::string>::iterator it = _cgi.find(extension);
+
+	if (it == _cgi.end())
 		_cgi.insert(std::pair<std::string, std::string>(extension, path));
+	else
+		it->second = path;
 }
 
 /****************/

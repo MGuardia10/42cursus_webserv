@@ -30,7 +30,12 @@ MAIN_SRC =	main.cpp		\
 			processRequests.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
-PARSE_SRC =	hardcoded_parse.cpp
+PARSE_SRC =	parse.cpp \
+			parseLocation.cpp \
+			parseServer.cpp \
+			directives.cpp \
+			getDirectives.cpp \
+			checkDirectives.cpp
 OBJ += $(PARSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 SERVER_SRC =	ConfigBase.cpp	\
