@@ -4,4 +4,4 @@
 #include <vector>
 #include "Server.hpp"
 
-void	processRequests(std::vector<Server> servers);
+void	process_requests(std::vector<Server> servers);

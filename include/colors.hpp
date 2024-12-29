@@ -1,4 +1,4 @@
-/* Colors */
+#pragma once
 
 #define RESET   "\033[0m"
 #define BLACK 	"\e[1;90m"

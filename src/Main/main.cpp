@@ -3,7 +3,7 @@
 #include "../../include/Server.hpp"
 #include "../../include/signals.hpp"
 #include "../../include/parse.hpp"
-#include "../../include/processRequests.hpp"
+#include "../../include/process_requests.hpp"
 
 int	help(char *cmd)
 {
@@ -39,14 +39,18 @@ int main(int argc, char *argv[])
 		for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)
 			it->run();
 	}
-	catch (std::exception const& e)
+	catch (Server::ServerException& e)
 	{
 		std::cout << "Error while running a server: " << e.what() << std::endl;
+
+		/* Close the started servers */
+		for (std::vector<Server>::iterator it = servers.begin(); it != servers.end() && (*it).is_running(); it++)
+			(*it).stop();
 		return (1);
 	}
 
-	/* TODO: Loop (until SIGINT) to detect the servers connections */
-	processRequests(servers);
+	/* Loop (until SIGINT) to detect the servers connections */
+	process_requests(servers);
 
 	/* Stop the servers and free the ports */
 	for (std::vector<Server>::iterator it = servers.begin(); it != servers.end(); it++)

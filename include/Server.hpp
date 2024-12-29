@@ -22,8 +22,13 @@ class Server : public ConfigBase
 		/* Name of the server */
 		std::string	_server_name;
 
+		/* Sockets */
+		std::vector<int>	_sockets;
+
 		/* List of the server locations */
 		std::map<std::string, Location>	_locations;
+
+		static int const BACKLOG = 10;
 
 	public:
 
@@ -46,9 +51,12 @@ class Server : public ConfigBase
 		std::string	get_server_name( void ) const;
 		void		set_server_name( std::string server_name );
 
-		std::map<std::string, Location>	get_locations( void ) const;
-		Location const*					get_location( std::string name ) const;
-		void							add_location( std::string name, Location location );
+		std::vector<int>	get_sockets( void ) const;
+		bool				has_socket( int sckt ) const;
+
+		std::map<std::string, Location>		get_locations( void ) const;
+		std::pair<bool, Location const*>	get_location( std::string route ) const;
+		void								add_location( std::string route, Location location );
 
 		/* NOTE: Objects features */
 		std::string	print( void ) const;
@@ -60,9 +68,10 @@ class Server : public ConfigBase
 		class ServerException : std::exception
 		{
 			private:
-				std::string const _msg;
+				std::string _msg;
 			public:
 				ServerException( std::string const msg ) throw();
+				ServerException( std::string const msg, std::string const error ) throw();
 				virtual ~ServerException( void ) throw();
 				virtual const char* what( void ) const throw();
 		};
