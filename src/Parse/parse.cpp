@@ -38,7 +38,7 @@ std::vector<Server>	parse( std::string const& filename )
 
 	/* Check file is open */
 	if ( !file.is_open() ) {
-		std::cerr << "Error opening file: " << filename << '\n';
+		std::cerr << RED << "[ ERROR ] Error opening file: " << filename << RESET << '\n';
         return servers;
 	}
 
