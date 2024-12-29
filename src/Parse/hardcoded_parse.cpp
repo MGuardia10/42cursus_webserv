@@ -8,7 +8,7 @@ static std::vector<Server> hardcodedServers( void )
 	Server s1;
 
 	s1.set_ip("127.0.0.2");
-	s1.set_ip("127.0.0.01");
+	s1.set_ip("127.0.0.1");
 	s1.add_port(8080);
 	s1.add_port(8081);
 	s1.set_server_name("Test");
