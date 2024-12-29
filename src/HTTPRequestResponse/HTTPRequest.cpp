@@ -142,16 +142,22 @@ void	HTTPRequest::parse_headers(std::string headers)
 		if (_method == "" || _path == "" || _protocol == "")
 		{
 			index = current_line.find(" ");
+			if (index == std::string::npos)
+				throw HTTPRequestException("Malformed first line of the header");
 			_method = current_line.substr(0, index);
 			current_line = current_line.substr(index + 1, current_line.size());
 
 			index = current_line.find(" ");
+			if (index == std::string::npos)
+				throw HTTPRequestException("Malformed first line of the header");
 			_path = current_line.substr(0, index);
 			_protocol = current_line.substr(index + 1, current_line.size());
 		}
 		else
 		{
 			index = current_line.find(": ");
+			if (index == std::string::npos)
+				throw HTTPRequestException("Malformed header");
 			_headers.insert(std::pair<std::string, std::string>(
 				current_line.substr(0, index),
 				current_line.substr(index + 2, current_line.size())
@@ -196,6 +202,7 @@ static std::string	get_boundary( std::map<std::string, std::string>& headers )
 	return header.substr(index + 9, header.size());
 }
 
+/** Function to get and process a HTML request */
 void	HTTPRequest::process_request( int fd )
 {
 	/* Buffers */
@@ -205,16 +212,17 @@ void	HTTPRequest::process_request( int fd )
 	size_t		headers_size;	/* Index to check the end of the headers part */
 	std::string body_string;	/* Aux variable to have the body as string */
 
-	/* Loop */
 	while (_content_length != 0)
 	{
-		/* Received the request and save it correctly */
+		/*
+			Received the request and save it correctly.
+			Also check if the request is fragment or if the connection is closed
+		*/
 		bytes_received = recv(fd, buffer, BUFFER_SIZE - 1, 0);
 		if (bytes_received < 0)
 			break ;
 		if (bytes_received == 0)
 		{
-			/* TODO: Maybe an exception should be better */
 			_is_closed = true;
 			_is_finished = true;
 			_file.close();
@@ -326,9 +334,15 @@ void	HTTPRequest::process_request( int fd )
 		/* Change names */
 		if (_request_filename != "")
 			move_body_file("/tmp/" + _request_filename);
+
+		/* Check if the connection is closed by the header */
+		std::map<std::string, std::string>::iterator map_it = _headers.find("Connection");
+		if (map_it != _headers.end() && map_it->second == "close")
+			_is_closed = true;
 	}
 }
 
+/** Function to move the body file to a specific path */
 void	HTTPRequest::move_body_file(std::string const& dest_path)
 {
 	/* Check if there is any file */
@@ -345,6 +359,7 @@ void	HTTPRequest::move_body_file(std::string const& dest_path)
 	}
 }
 
+/** Function to remove the body file */
 void	HTTPRequest::remove_body_file( void )
 {
 	if (_body_filename != "")
@@ -357,6 +372,18 @@ void	HTTPRequest::remove_body_file( void )
 /*============================================================================*/
 /* SECTION:                        Exceptions                                 */
 /*============================================================================*/
+
+HTTPRequest::HTTPRequestException::HTTPRequestException( std::string msg ) throw() :
+	_msg(msg)
+{}
+
+HTTPRequest::HTTPRequestException::~HTTPRequestException( void ) throw()
+{}
+
+const char* HTTPRequest::HTTPRequestException::what( void ) const throw()
+{
+	return _msg.c_str();
+}
 
 /*==========*/
 /* !SECTION */

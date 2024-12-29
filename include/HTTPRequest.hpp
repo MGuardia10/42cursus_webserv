@@ -44,8 +44,8 @@ class HTTPRequest
 		std::string			_request_filename;	/* Name that the file should have */
 
 		/* Process request aux */
-		size_t	_content_length;	/* Body size */
-		bool	_body_started;		/* Check if the body has started */
+		size_t	_content_length;		/* Body size */
+		bool	_body_started;			/* Check if the body has started */
 		bool	_body_headers_cleaned;	/* Check if the body headers (on files) are cleaned */
 
 		/* Private aux functions */
@@ -67,22 +67,49 @@ class HTTPRequest
 		std::map<std::string, std::string>	get_headers( void ) const;
 		std::pair<bool, std::string>		find_header( std::string header ) const;
 
-		/* TODO: content getters */
-		// std::string	get_content( void ) const;
-
 		bool		check_closed( void ) const;
 		bool		check_finished( void ) const;
 		std::string	get_filename( void ) const;
 
 		/* NOTE: Objects features */
+
+		/**
+		 * @brief Function to get and process a HTML request
+		 * 
+		 * @param	fd File descriptor where the request is recieved
+		 * 
+		 * @return void
+		 */
 		void	process_request( int fd );
 
+		/**
+		 * @brief Function to move the body file to a specific path
+		 * 
+		 * @param	dest_path The destination path
+		 * 
+		 * @return void
+		 */
 		void	move_body_file(std::string const& dest);
+
+		/**
+		 * @brief Function to remove the body file
+		 * 
+		 * @return void
+		 */
 		void	remove_body_file( void );
 
 		std::string	print( void ) const;
 
 		/* NOTE: Exceptions */
+		class HTTPRequestException : std::exception
+		{
+			private:
+				std::string const _msg;
+			public:
+				HTTPRequestException( std::string msg ) throw();
+				virtual ~HTTPRequestException( void ) throw();
+				virtual const char* what( void ) const throw();
+		};
 
 };
 
