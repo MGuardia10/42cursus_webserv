@@ -181,7 +181,7 @@ void	Server::run( void )
 	{
 		int port = *it;
 
-		if (port < 0 && port > 656656)
+		if (port < 0 && port > 65535)
 			throw ServerException("Invalid port");
 
 		/* Open the socket */
