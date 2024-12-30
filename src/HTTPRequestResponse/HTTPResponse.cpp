@@ -161,7 +161,8 @@ std::string	HTTPResponse::get_default_headers( int code, std::string cookie, boo
 		"\r\n";
 
 	/* Cookie */
-	header += "Set-Cookie: " + cookie + "\r\n";
+	if (!cookie.empty())
+		header += "Set-Cookie: " + cookie + "\r\n";
 
 	/* Cache Control */
 	header += "Cache-Control: no-cache\r\n";
@@ -173,6 +174,7 @@ std::string	HTTPResponse::get_default_headers( int code, std::string cookie, boo
 	return header;
 }
 
+/** Function to generate a general response, with a specified code and msg */
 std::string HTTPResponse::get_response_template( int code, std::string msg, std::string cookie )
 {
 	std::string header;
@@ -195,6 +197,7 @@ std::string HTTPResponse::get_response_template( int code, std::string msg, std:
 	return header + "\r\n" + body;
 }
 
+/** Function that generates a response that indicates that the connection is closed */
 std::string	HTTPResponse::get_close_connection_template( std::string cookie )
 {
 	std::string header;

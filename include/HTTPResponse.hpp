@@ -49,7 +49,26 @@ class HTTPResponse
 		static bool	load_data( void );
 
 		/* NOTE: pages */
+
+		/**
+		 * @brief Function to generate a general response, with a specified code and msg. Also,
+		 * 			a cookie can be added
+		 * 
+		 * @param	code Response code
+		 * @param	msg Message that will be displayed as HTML
+		 * @param	cookie Cookie of the client. If it is empty, no cookie is added
+		 * 
+		 * @return A correct response that can be sent
+		 */
 		static std::string	get_response_template( int code, std::string msg, std::string cookie );
+
+		/**
+		 * @brief Function that generates a response that indicates that the connection is closed
+		 * 
+		 * @param	cookie Cookie of the user to whom the response will be sent. Can be empty
+		 * 
+		 * @return A correct response that can be sent
+		 */
 		static std::string	get_close_connection_template( std::string cookie );
 
 };
