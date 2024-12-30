@@ -1,0 +1,35 @@
+extension,type
+
+# Text types
+html,text/html
+css,text/css
+
+# Code types
+js,application/javascript
+json,application/json
+xmp,application/xmp
+pdf,application/pdf
+
+# Images
+png,image/png
+jpeg,image/jpeg
+gif,image/gif
+svg,image/svg+xml
+
+# Video
+mp4,video/mp4
+webm,video/webm
+
+# Fonts (?)
+woff,font/woff
+woff2,font/woff2
+ttf,font/ttf
+otf,font/otf
+
+# Audio
+mp3,audio/mpeg
+wav,audio/wav
+ogg,audio/ogg
+m4a,audio/mp4
+flac,audio/flac
+aac,audio/aac
