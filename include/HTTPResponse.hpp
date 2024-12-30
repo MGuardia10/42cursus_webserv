@@ -7,10 +7,22 @@
 class HTTPResponse
 {
 	private:
-		static std::map<int, std::string>	_errors;
+		static std::map<int, std::string>	_codes;
 		static std::map<std::string, std::string> _extensions;
 
 		HTTPResponse( void );
+
+		/**
+		 * @brief Function to load the errors types. It reads the info on the
+		 * 			ERROR_PATH file.
+		 */
+		static bool	load_codes( void );
+
+		/**
+		 * @brief Function to load the errors types. It reads the info on the
+		 * 			EXTENSIONS_PATH file.
+		 */
+		static bool	load_extensions( void );
 
 		/**
 		 * @brief Function to get all the basic/general headers.
@@ -20,7 +32,7 @@ class HTTPResponse
 		 * 
 		 * @return The start header
 		 */
-		static std::string get_default_headers( int code, std::string cookie, bool end=true );
+		static std::string get_default_headers( int code, std::string cookie, bool connection_alive=true, bool end=true );
 
 	protected:
 	public:
@@ -28,29 +40,16 @@ class HTTPResponse
 		/* NOTE: Constructors and destructor */
 		~HTTPResponse( void );
 
-		/* NOTE: Member operators overloading */
-
-		/* NOTE: Getters and setters */
-
-		/* NOTE: Objects features */
-
-			/* NOTE: loads */
-		/**
-		 * @brief Function to load the errors types. It reads the info on the
-		 * 			ERROR_PATH file.
-		 */
-		static bool	load_errors( void );
+		/* NOTE: Loads */
 
 		/**
-		 * @brief Function to load the errors types. It reads the info on the
-		 * 			EXTENSIONS_PATH file.
+		 * @brief Function to load all the data necessary to prepare the
+		 * 			responses
 		 */
-		static bool	load_extensions( void );
+		static bool	load_data( void );
 
-			/* NOTE: pages */
+		/* NOTE: pages */
 		static std::string	get_response_template( int code, std::string msg, std::string cookie );
-
-
-		/* NOTE: Exceptions */
+		static std::string	get_close_connection_template( std::string cookie );
 
 };

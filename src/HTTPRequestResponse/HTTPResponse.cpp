@@ -7,7 +7,7 @@
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
 
-std::map<int, std::string>	HTTPResponse::_errors;
+std::map<int, std::string>	HTTPResponse::_codes;
 std::map<std::string, std::string>	HTTPResponse::_extensions;
 
 HTTPResponse::HTTPResponse( void )
@@ -31,7 +31,7 @@ HTTPResponse::~HTTPResponse( void )
 /*==========*/
 /* !SECTION */
 /*============================================================================*/
-/* SECTION:                      Object features                              */
+/* SECTION:                           Loads                                   */
 /*============================================================================*/
 
 /* NOTE: Loads */
@@ -75,8 +75,14 @@ static std::pair< bool, std::map<std::string, std::string> > read_csv_files( std
 	return std::pair< bool, std::map<std::string, std::string> >(true, data);
 }
 
+/** Function to load all the data necessary to prepare the responses */
+bool	HTTPResponse::load_data( void )
+{
+	return load_codes() && load_extensions();
+}
+
 /** Function to load the errors types. It reads the info on the ERROR_PATH file. */
-bool	HTTPResponse::load_errors( void )
+bool	HTTPResponse::load_codes( void )
 {
 	std::ifstream	file;
 
@@ -91,9 +97,9 @@ bool	HTTPResponse::load_errors( void )
 		return false;
 	
 	/* Save the data */
-	_errors.clear();
+	_codes.clear();
 	for (std::map<std::string, std::string>::iterator it = res.second.begin(); it != res.second.end(); it++)
-		_errors.insert(std::pair<int, std::string>(atoi(it->first.c_str()), it->second));
+		_codes.insert(std::pair<int, std::string>(atoi(it->first.c_str()), it->second));
 
 	return true;
 }
@@ -119,17 +125,25 @@ bool	HTTPResponse::load_extensions( void )
 	return true;
 }
 
-/* NOTE: pages */
+/*==========*/
+/* !SECTION */
+/*============================================================================*/
+/* SECTION:                           Pages                                   */
+/*============================================================================*/
 
 /** Function to get all the basic/general headers. */
-std::string	HTTPResponse::get_default_headers( int code, std::string cookie, bool end )
+std::string	HTTPResponse::get_default_headers( int code, std::string cookie, bool connection_alive, bool end )
 {
 	std::string header;
 
 	/* Status line */
 	std::stringstream ss;
+	std::map<int, std::string>::iterator code_search = _codes.find( code );
+
 	ss << code;
-	header = "HTTP/1.1 " + ss.str() + " OK\r\n";
+	header = "HTTP/1.1 " + ss.str() + " " +
+		(code_search != _codes.end() ? code_search->second : std::string("Undefined")) +
+		"\r\n";
 
 	/* Server name */
 	header += "Server: Webserv/1.0\r\n";
@@ -142,7 +156,9 @@ std::string	HTTPResponse::get_default_headers( int code, std::string cookie, boo
 	header += "Date: " + std::string(now_string) + "\r\n";
 
 	/* Connection */
-	header += "Connection: keep-alive\r\n";
+	header += "Connection: " +
+		(connection_alive ? std::string("keep-alive") : std::string("close")) +
+		"\r\n";
 
 	/* Cookie */
 	header += "Set-Cookie: " + cookie + "\r\n";
@@ -163,7 +179,7 @@ std::string HTTPResponse::get_response_template( int code, std::string msg, std:
 	std::string	body;
 
 	/* Get the default headers */
-	header = get_default_headers( code, cookie, false );
+	header = get_default_headers( code, cookie, true, false );
 
 	/* Set the body */
 	body = "<html><head><title>Webserv</title></head><body><p>" + msg + "</p></body></html>";
@@ -177,6 +193,16 @@ std::string HTTPResponse::get_response_template( int code, std::string msg, std:
 
 	/* Put everything together */
 	return header + "\r\n" + body;
+}
+
+std::string	HTTPResponse::get_close_connection_template( std::string cookie )
+{
+	std::string header;
+
+	/* General headers */
+	header = get_default_headers( 200, cookie, false, true );
+
+	return header;
 }
 
 /*==========*/

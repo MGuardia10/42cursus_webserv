@@ -26,8 +26,11 @@ int main(int argc, char *argv[])
 	assign_signals();
 
 	/* Read some config files */
-	if (!HTTPResponse::load_errors() || !HTTPResponse::load_extensions())
+	if (!HTTPResponse::load_data())
+	{
 		std::cerr << "[ ERROR ] Error reading some configuration files" << std::endl;
+		return (1);
+	}
 
 	/* Get the servers vector */
 	servers = parse(argv[1]);

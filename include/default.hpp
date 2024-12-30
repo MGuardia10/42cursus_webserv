@@ -27,7 +27,7 @@
 /***************************/
 
 /* Error codes path */
-# define ERRORS_PATH "src/HTTPRequestResponse/errors.csv"
+# define ERRORS_PATH "src/HTTPRequestResponse/codes.csv"
 
 /* Extensions path */
 # define EXTENSIONS_PATH "src/HTTPRequestResponse/extensions.csv"

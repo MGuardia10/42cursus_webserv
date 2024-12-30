@@ -1,4 +1,13 @@
 code,msg
+
+# OK Status
+200,OK
+201,Created
+
+# Moved status
+301,Moved Permanently
+
+# Error status
 400,Bad Request
 401,Unauthorized
 403,Forbidden

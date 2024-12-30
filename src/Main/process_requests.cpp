@@ -3,6 +3,7 @@
 #include "../../include/signals.hpp"
 #include "../../include/colors.hpp"
 #include "../../include/HTTPRequest.hpp"
+#include "../../include/HTTPResponse.hpp"
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -96,16 +97,19 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	client_it->second.set_request(NULL);
 
 	std::cout << "Preparing response" << std::endl;
-	std::string response =
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/html\r\n"
+	// std::string response =
+		// "HTTP/1.1 200 OK\r\n"
+		// "Content-Type: text/html\r\n"
 		// "Connection: keep-alive\r\n"
-		"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
-		"Content-Length: 210\r\n"
+		// "Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
+		// "Content-Length: 210\r\n"
 		// "Content-Length: 179\r\n"
-		"\r\n"
-		"<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
+		// "\r\n"
+		// "<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
 		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
+	std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
+
+		std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 	send(fd, response.c_str(), response.size(), 0);
 	std::cout << "Response sent" << std::endl;
 	/* !SECTION */
@@ -175,9 +179,13 @@ void	process_requests(std::vector<Server> servers_vector)
 		}
 	}
 
-	/* NOTE: Close the client fds */
-	/* FIXME: maybe a close header should be sent -> Response module */
+	/* NOTE: Close the client fds, sending a close response */
+	std::string response;
 	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); it++)
+	{
+		response = HTTPResponse::get_close_connection_template(it->second.get_cookie());
+		send(it->first, response.c_str(), response.size(), 0);
 		close(it->first);
+	}
 	/* TODO: Close the CGIs pipes */
 }
