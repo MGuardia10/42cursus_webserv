@@ -22,6 +22,10 @@
 /* Limit for client_max_body_size - 50mb */
 # define MAX_BODY_SIZE_BYTES			52428800
 
+
+/* Server protocol */
+# define SERVER_PROTOCOL				"HTML/1.1"
+
 /***************************/
 /* NOTE: HTTPResponse data */
 /***************************/
