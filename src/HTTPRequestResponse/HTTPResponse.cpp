@@ -237,7 +237,7 @@ std::string	HTTPResponse::get_close_connection_template( std::string cookie )
 }
 
 /** Function to return the data of a file */
-std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string path, std::string cookie, long long offset )
+std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std::string path, std::string cookie, long long offset )
 {
 	std::map<std::string, std::string> header;
 	std::string body, response;
@@ -256,7 +256,7 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string p
 	if (offset == 0)
 	{
 		/* Default headers */
-		header = get_default_headers( 200, cookie, true );
+		header = get_default_headers( (code < 0 ? 200 : code), cookie, true );
 
 		/* File length */
 		/* TODO: Check if it is a directory? */
@@ -308,6 +308,30 @@ std::string	HTTPResponse::get_return_response( Server::ReturnData* data, std::st
 		response = headers_map_to_string( header );
 	}
 	return response;
+}
+
+/** Function to return an error page */
+std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int code, std::string path, std::string cookie, long long offset )
+{
+	std::pair<long long, std::string> file_response;
+	std::string	response;
+	long long new_offset;
+
+	/* Read the file; if an error is detected, */
+	if (path != "")
+		file_response = get_file_response( code, path, cookie, offset);
+
+	if (path == "" || file_response.first < 0)
+	{
+		new_offset = 0;
+		response = get_response_template( code, "", cookie );
+	}
+	else
+	{
+		new_offset = file_response.first;
+		response = file_response.second;
+	}
+	return std::pair<long long, std::string>( new_offset, response );
 }
 
 /*==========*/

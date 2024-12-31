@@ -79,6 +79,8 @@ class HTTPResponse
 		 * @brief Function to return the data of a file. If the file on `path` is not found, a general
 		 * 			404 response is returned
 		 * 
+		 * @param	code Code that the response will have. If a negative number is provided, the code
+		 * 					will be 200
 		 * @param	path Path of the file to send
 		 * @param	cookie Cookie of the client
 		 * @param	offset Offset on the file search. If it is 0, the header is generated, and the read begins;
@@ -88,7 +90,7 @@ class HTTPResponse
 		 * 			the response returned is the last one; the second field is the response to sent.
 		 * 			If the first value is negative, an error ocurred
 		 */
-		static std::pair<long long, std::string>	get_file_response( std::string path, std::string cookie, long long offset );
+		static std::pair<long long, std::string>	get_file_response( int code, std::string path, std::string cookie, long long offset );
 
 		/**
 		 * @brief Function to generate the response of a return statement
@@ -99,4 +101,19 @@ class HTTPResponse
 		 * @return The response created
 		 */
 		static std::string	get_return_response( Server::ReturnData* data, std::string cookie );
+
+		/**
+		 * @brief Function to return an error page
+		 * 
+		 * @param	code Code that the response will have
+		 * @param	path Path where the error page is saved. If path is empty (""), a default page
+		 * 					is generated
+		 * @param	cookie Cookie of the client
+		 * @param	offset index of the last bytes sent; used if the page is too long
+		 * 
+		 * @return	On the first field, the index of the last byte sent: if it is 0, the file has been
+		 * 				read; on the second field, the current response is formed
+		 */
+		static std::pair<long long, std::string>	get_error_page_response( int code, std::string path, std::string cookie, long long offset );
+
 };
