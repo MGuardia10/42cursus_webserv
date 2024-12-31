@@ -149,7 +149,7 @@ std::string	headers_map_to_string( std::map<std::string, std::string> headers )
 		header += it->second + "\r\n";
 	
 	for (it = headers.begin(); it != headers.end(); it++)
-		if (it->first != "Server")
+		if (it->first != "Status")
 			header += it->first + ": " + it->second + "\r\n";
 	
 	return header + "\r\n";
@@ -275,7 +275,28 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string p
 
 	/* Return the response, plus headers if it is neccesary */
 	return std::pair<size_t, std::string>( new_offset, response );
+}
 
+/** Function to generate the response of a return statement */
+std::string	HTTPResponse::get_return_response( Server::ReturnData* data, std::string cookie )
+{
+	std::map<std::string, std::string> header;
+	std::string response;
+
+	if (!data)
+		return "";
+
+	/* Check if it is a redirection or a message */
+	if (data->text.find("http://") != 0 && data->text.find("https://") != 0)
+		response = get_response_template( data->code, data->text, cookie );
+	else
+	{
+		/* Redirection */
+		header = get_default_headers( data->code, cookie, false );
+		header["Location"] = data->text;
+		response = headers_map_to_string( header );
+	}
+	return response;
 }
 
 /*==========*/

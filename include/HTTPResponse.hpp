@@ -3,6 +3,7 @@
 #include <iostream>
 #include <map>
 #include "default.hpp"
+#include "Server.hpp"
 
 class HTTPResponse
 {
@@ -87,4 +88,14 @@ class HTTPResponse
 		 * 			If the first value is negative, an error ocurred
 		 */
 		static std::pair<long long, std::string>	get_file_response( std::string path, std::string cookie, long long offset );
+
+		/**
+		 * @brief Function to generate the response of a return statement
+		 * 
+		 * @param	data Information about the return
+		 * @param	cookie User client
+		 * 
+		 * @return The response created
+		 */
+		static std::string	get_return_response( Server::ReturnData* data, std::string cookie );
 };
