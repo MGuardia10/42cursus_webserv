@@ -196,19 +196,30 @@ std::string HTTPResponse::get_response_template( int code, std::string msg, std:
 {
 	std::map<std::string, std::string> header;
 	std::string	body;
+	std::stringstream ss;
+
+	std::map<int, std::string>::iterator code_it;
+	std::map<std::string, std::string>::iterator extension_it;
 
 	/* Get the default headers */
 	header = get_default_headers( code, cookie, true );
 
 	/* Set the body */
+	if (msg == "")
+	{
+		code_it = _codes.find( code );
+		ss.str("");
+		ss << code;
+		msg = ss.str() + " - " + (code_it == _codes.end() ? "Undefined" : code_it->second);
+	}
 	body = "<html><head><title>Webserv</title></head><body><p>" + msg + "</p></body></html>";
 
 	/* Add headers */
-	std::stringstream ss;
-	std::map<std::string, std::string>::iterator res = _extensions.find("html");
+	ss.str("");
 	ss << body.size();
 	header["Content-Length"] = ss.str();
-	header["Content-Type"] = (res == _extensions.end() ? "text/html" : res->second);
+	extension_it = _extensions.find("html");
+	header["Content-Type"] = (extension_it == _extensions.end() ? "text/html" : extension_it->second);
 
 	/* Put everything together */
 	return headers_map_to_string(header) + body;

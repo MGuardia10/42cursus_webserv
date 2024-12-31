@@ -58,7 +58,8 @@ class HTTPResponse
 		 * 			a cookie can be added
 		 * 
 		 * @param	code Response code
-		 * @param	msg Message that will be displayed as HTML
+		 * @param	msg Message that will be displayed as HTML. If there is no msg, the default
+		 * 				errir type is displayed
 		 * @param	cookie Cookie of the client. If it is empty, no cookie is added
 		 * 
 		 * @return A correct response that can be sent
