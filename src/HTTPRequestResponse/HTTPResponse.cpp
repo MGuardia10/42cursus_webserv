@@ -133,59 +133,72 @@ bool	HTTPResponse::load_extensions( void )
 /* SECTION:                           Pages                                   */
 /*============================================================================*/
 
-/* TODO: Cambiar la forma de los headers: std::map y formateador */
+/**
+ * @brief Function to save the headers on a map as a string
+ * 
+ * @param	headers The headers on a map
+ * 
+ * @return The complete headers as string
+ */
+std::string	headers_map_to_string( std::map<std::string, std::string> headers )
+{
+	std::string header = "";
+
+	std::map<std::string, std::string>::iterator it = headers.find("Status");
+	if (it != headers.end())
+		header += it->second + "\r\n";
+	
+	for (it = headers.begin(); it != headers.end(); it++)
+		if (it->first != "Server")
+			header += it->first + ": " + it->second + "\r\n";
+	
+	return header + "\r\n";
+}
 
 /** Function to get all the basic/general headers. */
-std::string	HTTPResponse::get_default_headers( int code, std::string cookie, bool connection_alive, bool end )
+std::map<std::string, std::string>	HTTPResponse::get_default_headers( int code, std::string cookie, bool connection_alive )
 {
-	std::string header;
+	std::map<std::string, std::string> headers;
 
 	/* Status line */
 	std::stringstream ss;
 	std::map<int, std::string>::iterator code_search = _codes.find( code );
 
 	ss << code;
-	header = "HTTP/1.1 " + ss.str() + " " +
-		(code_search != _codes.end() ? code_search->second : std::string("Undefined")) +
-		"\r\n";
+	headers["Status"] = "HTTP/1.1 " + ss.str() + " " +
+		(code_search != _codes.end() ? code_search->second : std::string("Undefined"));
 
 	/* Server name */
-	header += "Server: Webserv/1.0\r\n";
+	headers["Server"] = "Webserv/1.0";
 
 	/* Date */
 	time_t now_long = time(NULL);
 	tm *now_struct = gmtime(&now_long);
 	char now_string[80] = {0};
 	strftime(now_string, 80, "%a, %d %b %Y %H:%M:%S GMT", now_struct);
-	header += "Date: " + std::string(now_string) + "\r\n";
+	headers["Date"] = std::string(now_string);
 
 	/* Connection */
-	header += "Connection: " +
-		(connection_alive ? std::string("keep-alive") : std::string("close")) +
-		"\r\n";
+	headers["Connection"] = (connection_alive ? std::string("keep-alive") : std::string("close"));
 
 	/* Cookie */
 	if (!cookie.empty())
-		header += "Set-Cookie: " + cookie + "\r\n";
+		headers["Set-Cookie"] = cookie;
 
 	/* Cache Control */
-	header += "Cache-Control: no-cache\r\n";
+	headers["Cache-Control"] = "no-cache";
 
-	/* Check to add the header delimiter */
-	if (end)
-		header += "\r\n";
-
-	return header;
+	return headers;
 }
 
 /** Function to generate a general response, with a specified code and msg */
 std::string HTTPResponse::get_response_template( int code, std::string msg, std::string cookie )
 {
-	std::string header;
+	std::map<std::string, std::string> header;
 	std::string	body;
 
 	/* Get the default headers */
-	header = get_default_headers( code, cookie, true, false );
+	header = get_default_headers( code, cookie, true );
 
 	/* Set the body */
 	body = "<html><head><title>Webserv</title></head><body><p>" + msg + "</p></body></html>";
@@ -194,28 +207,29 @@ std::string HTTPResponse::get_response_template( int code, std::string msg, std:
 	std::stringstream ss;
 	std::map<std::string, std::string>::iterator res = _extensions.find("html");
 	ss << body.size();
-	header += "Content-Length: " + ss.str() + "\r\n";
-	header += "Content-Type: " + (res == _extensions.end() ? "text/html" : res->second) + "\r\n";
+	header["Content-Length"] = ss.str();
+	header["Content-Type"] = (res == _extensions.end() ? "text/html" : res->second);
 
 	/* Put everything together */
-	return header + "\r\n" + body;
+	return headers_map_to_string(header) + body;
 }
 
 /** Function that generates a response that indicates that the connection is closed */
 std::string	HTTPResponse::get_close_connection_template( std::string cookie )
 {
-	std::string header;
+	std::map<std::string, std::string> header;
 
 	/* General headers */
-	header = get_default_headers( 200, cookie, false, true );
+	header = get_default_headers( 200, cookie, false );
 
-	return header;
+	return headers_map_to_string(header);
 }
 
 /** Function to return the data of a file */
 std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string path, std::string cookie, long long offset )
 {
-	std::string header, body, response;
+	std::map<std::string, std::string> header;
+	std::string body, response;
 	std::ifstream	file;
 
 	/* Check if the file exists */
@@ -227,11 +241,11 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string p
 	}
 
 	/* If the offset is 0, generate the header */
-	header = "";
+	header.clear();
 	if (offset == 0)
 	{
 		/* Default headers */
-		header = get_default_headers( 200, cookie, true, false );
+		header = get_default_headers( 200, cookie, true );
 
 		/* File length */
 		/* TODO: Check if it is a directory? */
@@ -240,14 +254,14 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string p
 
 		std::stringstream	ss;
 		ss << data.st_size;
-		header += "Content-Length: " + ss.str() + "\r\n";		
+		header["Content-Length"] = ss.str();
 
 		/* File extension */
 		std::map<std::string, std::string>::iterator it;
 		size_t index = path.rfind(".");
 		if (index != std::string::npos)
 			 it = _extensions.find(path.substr(index + 1, path.size()));
-		header += "Content-Type: " + (index != std::string::npos && it != _extensions.end() ? it->second : "text/plain") + "\r\n\r\n";
+		header["Content-Type"] = (index != std::string::npos && it != _extensions.end() ? it->second : "text/plain");
 	}
 
 	/* Read and write on the buffer */
@@ -257,7 +271,7 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string p
 	body = std::string(&buffer[0], buffer.size());
 
 	size_t	new_offset = (file.gcount() == CHUNK_SIZE) ? offset + CHUNK_SIZE : 0;
-	response = (header == "") ? body : header + body;
+	response = (header.empty()) ? body : headers_map_to_string( header ) + body;
 
 	/* Return the response, plus headers if it is neccesary */
 	return std::pair<size_t, std::string>( new_offset, response );

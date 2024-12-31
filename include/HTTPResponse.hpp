@@ -27,12 +27,13 @@ class HTTPResponse
 		/**
 		 * @brief Function to get all the basic/general headers.
 		 * 
+		 * @param	code Response code, the message will be getted by the `CODES_PATH` file
 		 * @param	cookie Cookie of the client
-		 * @param	end Flag to set the header end delimiter
+		 * @param	connection_alive Check if the connection must be closed or not
 		 * 
-		 * @return The start header
+		 * @return A map with the defaults headers
 		 */
-		static std::string get_default_headers( int code, std::string cookie, bool connection_alive=true, bool end=true );
+		static std::map<std::string, std::string> get_default_headers( int code, std::string cookie, bool connection_alive=true );
 
 	protected:
 	public:
