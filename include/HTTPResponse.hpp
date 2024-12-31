@@ -38,6 +38,7 @@ class HTTPResponse
 	public:
 
 		/* NOTE: Constructors and destructor */
+		static size_t const	CHUNK_SIZE = 1024;
 		~HTTPResponse( void );
 
 		/* NOTE: Loads */
@@ -71,4 +72,18 @@ class HTTPResponse
 		 */
 		static std::string	get_close_connection_template( std::string cookie );
 
+		/**
+		 * @brief Function to return the data of a file. If the file on `path` is not found, a general
+		 * 			404 response is returned
+		 * 
+		 * @param	path Path of the file to send
+		 * @param	cookie Cookie of the client
+		 * @param	offset Offset on the file search. If it is 0, the header is generated, and the read begins;
+		 * 					if it is different from 0, the reading continues from this value
+		 * 
+		 * @return The return has 2 fields: the first one indicates the last byte sent, if it is 0,
+		 * 			the response returned is the last one; the second field is the response to sent.
+		 * 			If the first value is negative, an error ocurred
+		 */
+		static std::pair<long long, std::string>	get_file_response( std::string path, std::string cookie, long long offset );
 };

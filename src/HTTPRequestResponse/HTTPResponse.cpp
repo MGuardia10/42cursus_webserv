@@ -2,6 +2,8 @@
 #include <sstream>
 #include <fstream>
 #include <cstdlib>
+#include <vector>
+#include <sys/stat.h>
 
 /*============================================================================*/
 /* SECTION:               Constructors and destructor                         */
@@ -131,6 +133,8 @@ bool	HTTPResponse::load_extensions( void )
 /* SECTION:                           Pages                                   */
 /*============================================================================*/
 
+/* TODO: Cambiar la forma de los headers: std::map y formateador */
+
 /** Function to get all the basic/general headers. */
 std::string	HTTPResponse::get_default_headers( int code, std::string cookie, bool connection_alive, bool end )
 {
@@ -206,6 +210,58 @@ std::string	HTTPResponse::get_close_connection_template( std::string cookie )
 	header = get_default_headers( 200, cookie, false, true );
 
 	return header;
+}
+
+/** Function to return the data of a file */
+std::pair<long long, std::string>	HTTPResponse::get_file_response( std::string path, std::string cookie, long long offset )
+{
+	std::string header, body, response;
+	std::ifstream	file;
+
+	/* Check if the file exists */
+	file.open( path.c_str() );
+	if (!file.is_open())
+	{
+		response = get_response_template( 404, "The resource has not been found", cookie);
+		return std::pair<size_t, std::string>(-1, response);
+	}
+
+	/* If the offset is 0, generate the header */
+	header = "";
+	if (offset == 0)
+	{
+		/* Default headers */
+		header = get_default_headers( 200, cookie, true, false );
+
+		/* File length */
+		/* TODO: Check if it is a directory? */
+		struct stat data;
+		stat( path.c_str(), &data );
+
+		std::stringstream	ss;
+		ss << data.st_size;
+		header += "Content-Length: " + ss.str() + "\r\n";		
+
+		/* File extension */
+		std::map<std::string, std::string>::iterator it;
+		size_t index = path.rfind(".");
+		if (index != std::string::npos)
+			 it = _extensions.find(path.substr(index + 1, path.size()));
+		header += "Content-Type: " + (index != std::string::npos && it != _extensions.end() ? it->second : "text/plain") + "\r\n\r\n";
+	}
+
+	/* Read and write on the buffer */
+	std::vector<char>	buffer(CHUNK_SIZE);
+	file.seekg( offset );
+	file.read(&buffer[0], CHUNK_SIZE);
+	body = std::string(&buffer[0], buffer.size());
+
+	size_t	new_offset = (file.gcount() == CHUNK_SIZE) ? offset + CHUNK_SIZE : 0;
+	response = (header == "") ? body : header + body;
+
+	/* Return the response, plus headers if it is neccesary */
+	return std::pair<size_t, std::string>( new_offset, response );
+
 }
 
 /*==========*/
