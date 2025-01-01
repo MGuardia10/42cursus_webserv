@@ -3,7 +3,11 @@
 #include <fstream>
 #include <cstdlib>
 #include <vector>
+#include <algorithm>
 #include <sys/stat.h>
+
+#include <sys/types.h>
+#include <dirent.h>
 
 /*============================================================================*/
 /* SECTION:               Constructors and destructor                         */
@@ -332,6 +336,67 @@ std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int cod
 		response = file_response.second;
 	}
 	return std::pair<long long, std::string>( new_offset, response );
+}
+
+/** Function to generate the autoindex of a specific path */
+std::string	HTTPResponse::get_autoindex_response( std::string path, std::string cookie)
+{
+	std::string	body = "";
+	std::map<std::string, std::string> header;
+	std::stringstream	ss;
+
+	DIR*	folder;
+	std::vector< std::pair<dirent*, std::string> >	contents; /* Data, type */
+
+	/* Open the directory */
+	folder = opendir(path.c_str());
+	if (!folder)
+		return get_response_template( 500, "", cookie );
+	
+	/* Read all the files/folders, saving the pointers. ALso check the max number of characters, for style */
+	std::vector<dirent*>	files, folders;
+	dirent*	current_item;
+	size_t	max_length = 0;
+	contents.clear();
+
+	while ((current_item = readdir( folder )))
+	{
+		std::string	name = current_item->d_name;
+		if (name == "." || name == "..")
+			continue ;
+		
+		struct stat item_data;
+		stat(std::string(path + name).c_str(), &item_data);
+
+		if (S_ISDIR(item_data.st_mode))
+			folders.push_back(current_item);
+		else
+			files.push_back(current_item);
+
+		max_length = std::max( max_length, std::string(current_item->d_name).size() );
+	}
+
+	for (std::vector<dirent*>::iterator it = folders.begin(); it != folders.end(); it++)
+		contents.push_back(std::pair<dirent*, std::string>(*it, "Folder"));
+
+	for (std::vector<dirent*>::iterator it = files.begin(); it != files.end(); it++)
+		contents.push_back(std::pair<dirent*, std::string>(*it, "File"));
+
+	/* TODO: Print the body header  */
+	body = "<html><head><title>" + path + " autoindex - Webserv</title></head><body><h1>Indice de " + path +"</h1><hr></body>";
+
+	/* TODO: For each item, print the info */
+
+
+	/* Complete the headers */
+	header = get_default_headers( 200, cookie, true );
+	header["Content-Type"] = "text/html";
+	ss << body.size();
+	header["Content-Length"] = ss.str();
+
+	/* Mix all */
+	closedir( folder );
+	return headers_map_to_string( header ) + body;
 }
 
 /*==========*/

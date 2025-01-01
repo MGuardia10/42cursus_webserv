@@ -116,4 +116,13 @@ class HTTPResponse
 		 */
 		static std::pair<long long, std::string>	get_error_page_response( int code, std::string path, std::string cookie, long long offset );
 
+		/**
+		 * @brief Function to generate the autoindex of a specific path
+		 * 
+		 * @param	path Path of the root folder
+		 * @param	cookie Cookie of the client
+		 * 
+		 * @return The correct response
+		 */
+		static std::string	get_autoindex_response( std::string path, std::string cookie);
 };
