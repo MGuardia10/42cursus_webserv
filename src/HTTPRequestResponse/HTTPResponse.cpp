@@ -341,24 +341,24 @@ std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int cod
 /** Function to generate the autoindex of a specific path */
 std::string	HTTPResponse::get_autoindex_response( std::string path, std::string cookie)
 {
-	std::string	body = "";
+	std::string	head, body = "";
 	std::map<std::string, std::string> header;
 	std::stringstream	ss;
 
 	DIR*	folder;
-	std::vector< std::pair<dirent*, std::string> >	contents; /* Data, type */
+	std::vector< std::pair< dirent*, std::pair<std::string, std::string> > >	contents; /* < Data, <Type, Size> > */
 
 	/* Open the directory */
+	if (path[path.size() - 1] != '/')
+		path += "/";
 	folder = opendir(path.c_str());
 	if (!folder)
 		return get_response_template( 500, "", cookie );
 	
 	/* Read all the files/folders, saving the pointers. ALso check the max number of characters, for style */
-	std::vector<dirent*>	files, folders;
+	std::map<dirent*, std::string> files, folders; /* Data, */
 	dirent*	current_item;
-	size_t	max_length = 0;
 	contents.clear();
-
 	while ((current_item = readdir( folder )))
 	{
 		std::string	name = current_item->d_name;
@@ -368,27 +368,48 @@ std::string	HTTPResponse::get_autoindex_response( std::string path, std::string 
 		struct stat item_data;
 		stat(std::string(path + name).c_str(), &item_data);
 
-		if (S_ISDIR(item_data.st_mode))
-			folders.push_back(current_item);
-		else
-			files.push_back(current_item);
+		ss.str("");
+		ss << item_data.st_size;
 
-		max_length = std::max( max_length, std::string(current_item->d_name).size() );
+		if (S_ISDIR(item_data.st_mode))
+			folders.insert(std::pair<dirent*, std::string>(current_item, ss.str()));
+		else
+			files.insert(std::pair<dirent*, std::string>(current_item, ss.str()));
 	}
 
-	for (std::vector<dirent*>::iterator it = folders.begin(); it != folders.end(); it++)
-		contents.push_back(std::pair<dirent*, std::string>(*it, "Folder"));
+	for (std::map<dirent*, std::string>::iterator it = folders.begin(); it != folders.end(); it++)
+		contents.push_back(std::pair< dirent*, std::pair<std::string, std::string> >(it->first, std::pair<std::string, std::string>("Folder", it->second)));
 
-	for (std::vector<dirent*>::iterator it = files.begin(); it != files.end(); it++)
-		contents.push_back(std::pair<dirent*, std::string>(*it, "File"));
+	for (std::map<dirent*, std::string>::iterator it = files.begin(); it != files.end(); it++)
+		contents.push_back(std::pair< dirent*, std::pair<std::string, std::string> >(it->first, std::pair<std::string, std::string>("Files", it->second)));
 
-	/* TODO: Print the body header  */
-	body = "<html><head><title>" + path + " autoindex - Webserv</title></head><body><h1>Indice de " + path +"</h1><hr></body>";
+	/* Print a table with all the file data */
+	head = "<head><title>" + path + " autoindex - Webserv</title><style>"
+		"body {\nfont-family: Arial, sans-serif;\nmargin: 20px;\nbackground-color: #f9f9f9;\n}\n"
+		"table {\nwidth: 100%;\nborder-collapse: collapse;\nmargin: 20px 0;\nbackground-color: #ffffff;\nbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\n}\n"
+		"thead {\nbackground-color: #007bff;\ncolor: white;\n}\n"
+		"thead th {\ntext-align: center;\n}\n"
+		"th, td {\npadding: 10px;\ntext-align: left;\nborder: 1px solid #ddd;\n}\n"
+		"tbody tr:nth-child(even) {\nbackground-color: #f2f2f2;\n}\n"
+		"tbody tr:hover {\nbackground-color: #e0e0e0;\n}\n"
+		"thead tr:hover {\nbackground-color: #007bff;\n}\n"
+		"a {\ncolor: #007bff;\ntext-decoration: none;\nfont-weight: bold;\ntransition: color 0.3s, text-decoration 0.3s;\n}\n"
+		"a:hover {\ncolor: #0056b3;\ntext-decoration: underline;\n}\n"
+	"</style></head>";
+	body = "<body><h1>Index of " + path + "</h1><hr><table><thead><tr><th>Name</th><th>Type</th><th>Size (bytes)</th></tr></thead><tbody>";
 
-	/* TODO: For each item, print the info */
+	// body += "<tr><td>404.html</td><td>File</td><td>400B</td></tr>";
+	for (std::vector< std::pair< dirent*, std::pair<std::string, std::string> > >::iterator it = contents.begin(); it != contents.end(); it++)
+	{
+		std::string href = std::string(it->first->d_name) + (it->second.first == "Folder" ? "/" : "");
+		body += "<tr><td><a href=\"" + href + "\">" + href + "</a></td><td>" + it->second.first + "</td><td>" + it->second.second + "</td></tr>";
+	}
 
+	body += "</tbody></body></html>";
+	body = head + body;
 
 	/* Complete the headers */
+	ss.str("");
 	header = get_default_headers( 200, cookie, true );
 	header["Content-Type"] = "text/html";
 	ss << body.size();
