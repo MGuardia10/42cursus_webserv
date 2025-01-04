@@ -123,9 +123,9 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		.code = 301,
 		.text = "https://www.google.com"
 	};
-	response = HTTPResponse::get_return_response( &ret_data, client_it->second.get_cookie() );
-	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	send(fd, response.c_str(), response.size(), 0);
+	// response = HTTPResponse::get_return_response( &ret_data, client_it->second.get_cookie() );
+	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	// send(fd, response.c_str(), response.size(), 0);
 
 	// response = HTTPResponse::get_response_template( 404, "", client_it->second.get_cookie());
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
@@ -142,9 +142,9 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	// 	send(fd, response.c_str(), response.size(), 0);
 	// } while (offset != 0);
 
-	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
-	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// send(fd, response.c_str(), response.size(), 0);
+	response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
+	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	send(fd, response.c_str(), response.size(), 0);
 
 
 	/* !SECTION */
