@@ -13,7 +13,6 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-
 /**
  * @brief Funtion to save the new servers connections
  * 
@@ -90,6 +89,8 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return true;
 	}
 
+	// Deberia retornar objeto response para luego hacer el send desde aqui (?) Siempre debe retornar una response
+	// validate_request( client_it->second, &request );
 	/* Delete the request data */
 	/* FIXME: the information to check on the request has to be checked previously */
 	delete request;
