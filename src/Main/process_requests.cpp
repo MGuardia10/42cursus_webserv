@@ -93,10 +93,8 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 
 	/* Delete the request data */
 	/* FIXME: the information to check on the request has to be checked previously */
-	delete request;
-	client_it->second.set_request(NULL);
-
 	std::cout << "Preparing response" << std::endl;
+	std::string response;
 	// std::string response =
 		// "HTTP/1.1 200 OK\r\n"
 		// "Content-Type: text/html\r\n"
@@ -107,12 +105,49 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		// "\r\n"
 		// "<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
 		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
-	std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
+	// std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
 
-		std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	// long long offset = 0;
+	// do
+	// {
+	// 	std::pair<long long, std::string> data = HTTPResponse::get_file_response(200, "pages/assets/abarrio.jpeg", client_it->second.get_cookie(), offset);
+	// 	offset = data.first;
+	// 	response = data.second;
+
+	// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	// 	send(fd, response.c_str(), response.size(), 0);
+	// 	std::cout << "Response sent" << std::endl;
+	// } while (offset != 0);
+
+	// Server::ReturnData ret_data = {
+	// 	.code = 301,
+	// 	.text = "https://www.google.com"
+	// };
+	// response = HTTPResponse::get_return_response( &ret_data, client_it->second.get_cookie() );
+
+	// response = HTTPResponse::get_response_template( 404, "", client_it->second.get_cookie());
+	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	// send(fd, response.c_str(), response.size(), 0);
+
+	// long long offset = 0;
+	// do
+	// {
+	// 	std::pair<long long, std::string> data;
+	// 	data = HTTPResponse::get_error_page_response(404, "Mkaefile", client_it->second.get_cookie(), offset);
+	// 	offset = data.first;
+	// 	response = data.second;
+	// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	// 	send(fd, response.c_str(), response.size(), 0);
+	// } while (offset != 0);
+
+	response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
+	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 	send(fd, response.c_str(), response.size(), 0);
-	std::cout << "Response sent" << std::endl;
+
+
 	/* !SECTION */
+	delete request;
+	client_it->second.set_request(NULL);
 	return false;
 }
 
