@@ -252,7 +252,7 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std
 	if (!file.is_open())
 	{
 		response = get_response_template( 404, "The resource has not been found", cookie);
-		return std::pair<size_t, std::string>(-1, response);
+		return std::pair<long long, std::string>(-1, response);
 	}
 
 	/* If the offset is 0, generate the header */
@@ -263,7 +263,6 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std
 		header = get_default_headers( (code < 0 ? 200 : code), cookie, true );
 
 		/* File length */
-		/* TODO: Check if it is a directory? */
 		struct stat data;
 		stat( path.c_str(), &data );
 
@@ -289,11 +288,11 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std
 	response = (header.empty()) ? body : headers_map_to_string( header ) + body;
 
 	/* Return the response, plus headers if it is neccesary */
-	return std::pair<size_t, std::string>( new_offset, response );
+	return std::pair<long long, std::string>( new_offset, response );
 }
 
 /** Function to generate the response of a return statement */
-std::string	HTTPResponse::get_return_response( Server::ReturnData* data, std::string cookie )
+std::string	HTTPResponse::get_return_response( ConfigBase::ReturnData* data, std::string cookie )
 {
 	std::map<std::string, std::string> header;
 	std::string response;
@@ -323,7 +322,7 @@ std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int cod
 
 	/* Read the file; if an error is detected, */
 	if (path != "")
-		file_response = get_file_response( code, path, cookie, offset);
+		file_response = get_file_response( code, path, cookie, offset );
 
 	if (path == "" || file_response.first < 0)
 	{
@@ -339,7 +338,7 @@ std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int cod
 }
 
 /** Function to generate the autoindex of a specific path */
-std::string	HTTPResponse::get_autoindex_response( std::string path, std::string cookie)
+std::string	HTTPResponse::get_autoindex_response( std::string path, std::string cookie )
 {
 	std::string	head, body = "";
 	std::map<std::string, std::string> header;
@@ -398,7 +397,6 @@ std::string	HTTPResponse::get_autoindex_response( std::string path, std::string 
 	"</style></head>";
 	body = "<body><h1>Index of " + path + "</h1><hr><table><thead><tr><th>Name</th><th>Type</th><th>Size (bytes)</th></tr></thead><tbody>";
 
-	// body += "<tr><td>404.html</td><td>File</td><td>400B</td></tr>";
 	for (std::vector< std::pair< dirent*, std::pair<std::string, std::string> > >::iterator it = contents.begin(); it != contents.end(); it++)
 	{
 		std::string href = std::string(it->first->d_name) + (it->second.first == "Folder" ? "/" : "");

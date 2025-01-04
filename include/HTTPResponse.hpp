@@ -36,6 +36,19 @@ class HTTPResponse
 		 */
 		static std::map<std::string, std::string> get_default_headers( int code, std::string cookie, bool connection_alive=true );
 
+		/**
+		 * @brief Function to generate a general response, with a specified code and msg. Also,
+		 * 			a cookie can be added
+		 * 
+		 * @param	code Response code
+		 * @param	msg Message that will be displayed as HTML. If there is no msg, the default
+		 * 				error type is displayed
+		 * @param	cookie Cookie of the client. If it is empty, no cookie is added
+		 * 
+		 * @return A correct response that can be sent
+		 */
+		static std::string	get_response_template( int code, std::string msg, std::string cookie );
+
 	protected:
 	public:
 
@@ -52,19 +65,6 @@ class HTTPResponse
 		static bool	load_data( void );
 
 		/* NOTE: pages */
-
-		/**
-		 * @brief Function to generate a general response, with a specified code and msg. Also,
-		 * 			a cookie can be added
-		 * 
-		 * @param	code Response code
-		 * @param	msg Message that will be displayed as HTML. If there is no msg, the default
-		 * 				errir type is displayed
-		 * @param	cookie Cookie of the client. If it is empty, no cookie is added
-		 * 
-		 * @return A correct response that can be sent
-		 */
-		static std::string	get_response_template( int code, std::string msg, std::string cookie );
 
 		/**
 		 * @brief Function that generates a response that indicates that the connection is closed
@@ -100,7 +100,7 @@ class HTTPResponse
 		 * 
 		 * @return The response created
 		 */
-		static std::string	get_return_response( Server::ReturnData* data, std::string cookie );
+		static std::string	get_return_response( ConfigBase::ReturnData* data, std::string cookie );
 
 		/**
 		 * @brief Function to return an error page
@@ -124,5 +124,5 @@ class HTTPResponse
 		 * 
 		 * @return The correct response
 		 */
-		static std::string	get_autoindex_response( std::string path, std::string cookie);
+		static std::string	get_autoindex_response( std::string path, std::string cookie );
 };
