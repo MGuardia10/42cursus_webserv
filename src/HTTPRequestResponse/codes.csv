@@ -1,0 +1,21 @@
+code,msg
+
+# OK Status
+200,OK
+201,Created
+
+# Moved status
+301,Moved Permanently
+
+# Error status
+400,Bad Request
+401,Unauthorized
+403,Forbidden
+404,Not Found
+405,Method Not Allowed
+408,Request Timeout
+409,Conflict
+500,Interval Server Error
+501,Not Implemented
+502,Bad Gateway
+503,Service Unavailable

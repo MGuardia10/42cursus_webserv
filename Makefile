@@ -21,11 +21,13 @@ VPATH =	include/:		\
 OBJ_FOLDER=obj
 
 # NOTE: Headers
-HEADERS=	ConfigBase.hpp	\
+HEADERS=	default.hpp		\
+			ConfigBase.hpp	\
 			Location.hpp	\
 			Server.hpp		\
 			Client.hpp		\
-			HTTPRequest.hpp
+			HTTPRequest.hpp	\
+			HTTPResponse.hpp
 
 # NOTE: Source files
 MAIN_SRC =	main.cpp		\
@@ -48,7 +50,8 @@ SERVER_SRC =	ConfigBase.cpp	\
 				Client.cpp
 OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
-HTTPREQUESTRESPONSE_SRC =	HTTPRequest.cpp
+HTTPREQUESTRESPONSE_SRC =	HTTPRequest.cpp	\
+							HTTPResponse.cpp
 OBJ += $(HTTPREQUESTRESPONSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 #####################################################################################################################
