@@ -4,6 +4,7 @@
 #include "../../include/signals.hpp"
 #include "../../include/parse.hpp"
 #include "../../include/process_requests.hpp"
+#include "../../include/HTTPResponse.hpp"
 
 int	help(char *cmd)
 {
@@ -23,6 +24,13 @@ int main(int argc, char *argv[])
 
 	/* Assign the necessary signals (SIGINT) */
 	assign_signals();
+
+	/* Read some config files */
+	if (!HTTPResponse::load_data())
+	{
+		std::cerr << "[ ERROR ] Error reading some configuration files" << std::endl;
+		return (1);
+	}
 
 	/* Get the servers vector */
 	servers = parse(argv[1]);

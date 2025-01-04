@@ -88,9 +88,9 @@ std::string Client::generate_cookie( void ) const
 	/* Expires */
 	time_t now_long = time(NULL);
 	tm *now_struct = gmtime(&now_long);
-	now_struct->tm_mday += 1;
+	now_struct->tm_year += 1;
 	char now_string[80] = {0};
-	strftime(now_string, 80, "%a, %d-%b-%Y %H:%M:%S GMT", now_struct);
+	strftime(now_string, 80, "%a, %d %b %Y %H:%M:%S GMT", now_struct);
 	cookie += "Expires=" + std::string(now_string) + "; ";
 
 	/* Path */
