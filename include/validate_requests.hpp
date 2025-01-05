@@ -1,7 +1,17 @@
 #pragma once
 
 #include <iostream>
-#include "../../include/Client.hpp"
-#include "../../include/HTTPRequest.hpp"
+#include "./Client.hpp"
+#include "./HTTPRequest.hpp"
 
-void	validate_request( Client client, HTTPRequest request );
+struct ErrorPageData {
+	int 		code;
+	std::string path;
+};
+
+struct RequestData {
+	ConfigBase::ReturnData	returnData;
+	ErrorPageData			errorData;
+};
+
+RequestData	validate_request( Client client, HTTPRequest* request );

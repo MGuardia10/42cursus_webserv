@@ -1,4 +1,5 @@
 #include "../../include/process_requests.hpp"
+#include "../../include/validate_requests.hpp"
 #include "../../include/Client.hpp"
 #include "../../include/signals.hpp"
 #include "../../include/colors.hpp"
@@ -90,62 +91,101 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return true;
 	}
 
-	// Deberia retornar objeto response para luego hacer el send desde aqui (?) Siempre debe retornar una response
-	// validate_request( client_it->second, &request );
+	RequestData request_data = validate_request( client_it->second, request );
+	std::string response;
+
+	std::cout << "************* request data *************\n";
+	std::cout << "Errordata.code = " << request_data.errorData.code << "\n";
+	std::cout << "Errordata.path = " << request_data.errorData.path << "\n";
+	std::cout << "returnData.code = " << request_data.returnData.code << "\n";
+	std::cout << "returnData.text = " << request_data.returnData.text << "\n\n";
+
+	/* Return case */
+	if ( request_data.returnData.code != -1 ) {
+
+		/* Get response */
+		response = HTTPResponse::get_return_response( &request_data.returnData, client_it->second.get_cookie() );
+		
+		/* Send response */
+		send(fd, response.c_str(), response.size(), 0);
+		
+		/* Return false */
+		return false;
+	}
+
+	/* Error_page case */
+	if ( request_data.errorData.code != -1 ) {
+
+		/* Set offset */
+		long long offset = 0;
+
+		do
+		{
+			/* Get error page */
+			std::pair<long long, std::string> data;
+			data = HTTPResponse::get_error_page_response( request_data.errorData.code, request_data.errorData.path, client_it->second.get_cookie(), offset );
+			
+			/* Update offset and response values */
+			offset = data.first;
+			response = data.second;
+			std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+			std::cout << "OFFSET:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << offset << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+			
+			/* Send response */
+			send(client_it->second.get_fd(), response.c_str(), response.size(), 0);
+
+		} while (offset != 0);
+
+		return false;
+	}
+
 	/* Delete the request data */
 	/* FIXME: the information to check on the request has to be checked previously */
 	std::cout << "Preparing response" << std::endl;
-	std::string response;
-	// std::string response =
-		// "HTTP/1.1 200 OK\r\n"
-		// "Content-Type: text/html\r\n"
-		// "Connection: keep-alive\r\n"
-		// "Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
-		// "Content-Length: 210\r\n"
+	// std::string response;
+	response =
+		"HTTP/1.1 200 OK\r\n"
+		"Content-Type: text/html\r\n"
+		"Connection: keep-alive\r\n"
+		"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
+		"Content-Length: 210\r\n"
 		// "Content-Length: 179\r\n"
-		// "\r\n"
-		// "<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
+		"\r\n"
+		"<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
 		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
 	// std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
 
-	// long long offset = 0;
-	// do
-	// {
-	// 	std::pair<long long, std::string> data = HTTPResponse::get_file_response(200, "pages/assets/abarrio.jpeg", client_it->second.get_cookie(), offset);
-	// 	offset = data.first;
-	// 	response = data.second;
+		// /* Set offset */
+		// long long offset = 0;
 
-	// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// 	send(fd, response.c_str(), response.size(), 0);
-	// 	std::cout << "Response sent" << std::endl;
-	// } while (offset != 0);
+		// /* Loop until offset 0 again */
+		// do
+		// {
+		// 	std::pair<long long, std::string> data = HTTPResponse::get_file_response( 200, "pages/assets/abarrio.jpeg", client_it->second.get_cookie(), offset );
+		// 	offset = data.first;
+		// 	response = data.second;
 
-	ConfigBase::ReturnData ret_data = {
-		.code = 301,
-		.text = "https://www.google.com"
-	};
+		// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+		// 	send(fd, response.c_str(), response.size(), 0);
+		// 	std::cout << "Response sent" << std::endl;
+		// } while (offset != 0);
+
+	// ConfigBase::ReturnData ret_data = {
+	// 	.code = 301,
+	// 	.text = "https://www.google.com"
+	// };
 	// response = HTTPResponse::get_return_response( &ret_data, client_it->second.get_cookie() );
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// send(fd, response.c_str(), response.size(), 0);
+	send(fd, response.c_str(), response.size(), 0);
 
 	// response = HTTPResponse::get_response_template( 404, "", client_it->second.get_cookie());
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 	// send(fd, response.c_str(), response.size(), 0);
 
-	// long long offset = 0;
-	// do
-	// {
-	// 	std::pair<long long, std::string> data;
-	// 	data = HTTPResponse::get_error_page_response(404, "Mkaefile", client_it->second.get_cookie(), offset);
-	// 	offset = data.first;
-	// 	response = data.second;
-	// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// 	send(fd, response.c_str(), response.size(), 0);
-	// } while (offset != 0);
 
-	response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
-	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	send(fd, response.c_str(), response.size(), 0);
+	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
+	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
+	// send(fd, response.c_str(), response.size(), 0);
 
 
 	/* !SECTION */
