@@ -17,7 +17,8 @@ VPATH =	include/:		\
 		src/Main/:		\
 		src/Parse:		\
 		src/Server/:	\
-		src/HTTPRequestResponse/:
+		src/HTTPRequestResponse/:	\
+		src/Methods/:
 OBJ_FOLDER=obj
 
 # NOTE: Headers
@@ -27,7 +28,8 @@ HEADERS=	default.hpp		\
 			Server.hpp		\
 			Client.hpp		\
 			HTTPRequest.hpp	\
-			HTTPResponse.hpp
+			HTTPResponse.hpp	\
+			methods.hpp
 
 # NOTE: Source files
 MAIN_SRC =	main.cpp		\
@@ -53,6 +55,11 @@ OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 HTTPREQUESTRESPONSE_SRC =	HTTPRequest.cpp	\
 							HTTPResponse.cpp
 OBJ += $(HTTPREQUESTRESPONSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
+
+METHODS_SRC =	get_method.cpp	\
+				post_method.cpp	\
+				delete_method.cpp
+OBJ += $(METHODS_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 #####################################################################################################################
 

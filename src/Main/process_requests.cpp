@@ -5,6 +5,7 @@
 #include "../../include/colors.hpp"
 #include "../../include/HTTPRequest.hpp"
 #include "../../include/HTTPResponse.hpp"
+#include "../../include/methods.hpp"
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -137,7 +138,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return false;
 	}
 	
-	/* TODO: Check the method and call a function */
+	/* Got the full path */
 	std::pair<bool, Location const*> location = client_it->second.get_server().get_location( request->get_path() );
 	std::string	full_path;
 
@@ -169,6 +170,13 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 
 	std::cout << "Full path: " << full_path << std::endl;
 	
+	/* TODO: Check the method and call a function */
+	if (request->get_method() == "GET")
+		get_method( full_path, client_it->second, request );
+	else if (request->get_method() == "POST")
+		post_method( full_path, client_it->second, request );
+	else /* DELETE */
+		delete_method( full_path, client_it->second, request );
 
 
 	/* Delete the request data */
