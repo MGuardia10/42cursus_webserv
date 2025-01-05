@@ -17,12 +17,12 @@ std::string build_error_page_path( const ConfigBase& item, int code ) {
     } else if ( Location const* location = dynamic_cast<const Location*>( &item ) ) {
         /* Case item is a location, check ALIAS */
 		if ( location->get_alias().empty() ) {
-			std::string basePath = location->get_root() + location->get_route();
-			path = basePath + error_file;
+			path = location->get_root() + location->get_route() + error_file;
 		}
 		else {
-			std::string basePath = location->get_root() + location->get_alias();
-			path = basePath + error_file;
+			std::string alias = location->get_alias();
+			alias = (alias.at( alias.size() - 1 ) == '/' ) ? alias.substr( 0, alias.size() - 1 ) : alias;
+			path = location->get_root() + alias + error_file;
 		}
     }
 

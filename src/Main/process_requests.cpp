@@ -147,26 +147,20 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	if (root == "")	root = ".";
 	std::string route = location.second->get_route();
 	if (route == "/") route = "";
-	std::cout << "Root: " << root << std::endl;
-	std::cout << "Route: " << route << std::endl;
-	std::cout << "Alias: " << alias << std::endl;
-	std::cout << "Path: " << request->get_path() << std::endl;
 
 	/* Mkae the path takeing into account the alias of the location */
 	if (alias == "")
 		full_path = root + route + request->get_path();
 	else
 	{
-		/*
-			Root: /home/webserv
-			Route: /test
-			Alias: /pages
-
-			Request: /test/index.html
-			Path => /home/webserv/pages/index.html
-		*/
-
-		full_path = root + alias + std::string(&request->get_path()[alias.size()]);
+		/* Get path withoute route to insert alias */
+		std::string path = request->get_path().replace( 0 , route.size(), ""  );
+		
+		/* Create full path */
+		full_path = root + alias + path; // retocar LUIS LO HIZO MAL, ya etsa arreglado pro el grandioso Miguel aka mguardia xd lol jaja
+		
+		/* remove last "/" */
+		full_path = (full_path.at( full_path.size() - 1 ) == '/' ) ? full_path.substr( 0, full_path.size() - 1 ) : full_path;
 	}
 
 	std::cout << "Full path: " << full_path << std::endl;
@@ -178,8 +172,6 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		post_method( full_path, client_it->second, request );
 	else /* DELETE */
 		delete_method( full_path, client_it->second, request );
-
-
 	
 	// std::cout << "Preparing response" << std::endl;
 	// std::string response;
