@@ -65,22 +65,25 @@ bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::map<int
 */
 bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 {
+	std::string response;
 	std::map<int, Client>::iterator client_it = clients.find(fd);
+
 	if (client_it == clients.end())
 		return false;
 	std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd;
 
+	/* NOTE: Save all the request */
 	HTTPRequest*	request = client_it->second.get_request();
 	if (!request)
 	{
 		request = new HTTPRequest();
 		client_it->second.set_request(request);
 	}
+
+	/* If the request is not finished or is a close connection, do some things */
 	request->process_request( fd );
 	if (!request->check_finished())
 		return false;
-
-	std::cout << *request << std::endl;
 
 	if (request->check_closed())
 	{
@@ -91,25 +94,20 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return true;
 	}
 
+	/* NOTE: Validate the request */
 	RequestData request_data = validate_request( client_it->second, request );
-	std::string response;
-
-	std::cout << "************* request data *************\n";
-	std::cout << "Errordata.code = " << request_data.errorData.code << "\n";
-	std::cout << "Errordata.path = " << request_data.errorData.path << "\n";
-	std::cout << "returnData.code = " << request_data.returnData.code << "\n";
-	std::cout << "returnData.text = " << request_data.returnData.text << "\n\n";
 
 	/* Return case */
 	if ( request_data.returnData.code != -1 ) {
 
 		/* Get response */
 		response = HTTPResponse::get_return_response( &request_data.returnData, client_it->second.get_cookie() );
-		
-		/* Send response */
+
 		send(fd, response.c_str(), response.size(), 0);
 		
 		/* Return false */
+		delete request;
+		client_it->second.set_request(NULL);
 		return false;
 	}
 
@@ -128,30 +126,30 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 			/* Update offset and response values */
 			offset = data.first;
 			response = data.second;
-			std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-			std::cout << "OFFSET:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << offset << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-			
+
 			/* Send response */
-			send(client_it->second.get_fd(), response.c_str(), response.size(), 0);
+			send(fd, response.c_str(), response.size(), 0);
 
 		} while (offset != 0);
 
+		delete request;
+		client_it->second.set_request(NULL);
 		return false;
 	}
 
 	/* Delete the request data */
 	/* FIXME: the information to check on the request has to be checked previously */
-	std::cout << "Preparing response" << std::endl;
+	// std::cout << "Preparing response" << std::endl;
 	// std::string response;
-	response =
-		"HTTP/1.1 200 OK\r\n"
-		"Content-Type: text/html\r\n"
-		"Connection: keep-alive\r\n"
-		"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
-		"Content-Length: 210\r\n"
-		// "Content-Length: 179\r\n"
-		"\r\n"
-		"<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
+	// response =
+	// 	"HTTP/1.1 200 OK\r\n"
+	// 	"Content-Type: text/html\r\n"
+	// 	"Connection: keep-alive\r\n"
+	// 	"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
+	// 	"Content-Length: 210\r\n"
+	// 	// "Content-Length: 179\r\n"
+	// 	"\r\n"
+	// 	"<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
 		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
 	// std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
 
@@ -170,23 +168,11 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		// 	std::cout << "Response sent" << std::endl;
 		// } while (offset != 0);
 
-	// ConfigBase::ReturnData ret_data = {
-	// 	.code = 301,
-	// 	.text = "https://www.google.com"
-	// };
-	// response = HTTPResponse::get_return_response( &ret_data, client_it->second.get_cookie() );
-	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	send(fd, response.c_str(), response.size(), 0);
-
-	// response = HTTPResponse::get_response_template( 404, "", client_it->second.get_cookie());
-	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// send(fd, response.c_str(), response.size(), 0);
-
-
 	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 	// send(fd, response.c_str(), response.size(), 0);
 
+	/* TODO: Check the method and call a function */
 
 	/* !SECTION */
 	delete request;

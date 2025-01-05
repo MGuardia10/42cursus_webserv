@@ -14,4 +14,4 @@ struct RequestData {
 	ErrorPageData			errorData;
 };
 
-RequestData	validate_request( Client client, HTTPRequest* request );
+RequestData	validate_request( Client& client, HTTPRequest* request );

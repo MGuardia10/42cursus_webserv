@@ -1,10 +1,6 @@
 #include "../../include/validate_requests.hpp"
 #include <cstdlib>
 
-bool	is_supported_HTTP_method( std::string method ) {
-	return method.compare( "GET" ) == 0 || method.compare( "POST" ) == 0 || method.compare( "DELETE" ) == 0;
-}
-
 std::string build_error_page_path( const ConfigBase& item, int code ) {
 	
 	std::string path = "";
@@ -37,9 +33,9 @@ std::string build_error_page_path( const ConfigBase& item, int code ) {
 	return path;
 }
 
-RequestData	validate_request( Client client, HTTPRequest* request ) {
+RequestData	validate_request( Client& client, HTTPRequest* request ) {
 	
-	/* 1. Get Client's server, and initialize RequestData values */
+	/* NOTE: 1. Get Client's server, and initialize RequestData values */
 	Server const clientServer = client.get_server();
 	RequestData request_data;
 	request_data.errorData.code = -1;
@@ -47,7 +43,7 @@ RequestData	validate_request( Client client, HTTPRequest* request ) {
 	request_data.returnData.code = -1;
 	request_data.returnData.text = "";
 
-	/* 2. Check protocol is HTTP/1.1 */
+	/* NOTE: 2. Check protocol is HTTP/1.1 */
 	if ( request->get_protocol().compare( "HTTP/1.1" ) != 0 ) {
 		
 		/* Set errorData code to 505 */
@@ -60,7 +56,7 @@ RequestData	validate_request( Client client, HTTPRequest* request ) {
 		return request_data;
 	}
 
-	/* 3. Check request path to a Location */
+	/* NOTE: 3. Check request path to a Location */
 	std::pair<bool, Location const*> location = clientServer.get_location( request->get_path() );
 	if ( !location.first ) {
 
@@ -74,7 +70,7 @@ RequestData	validate_request( Client client, HTTPRequest* request ) {
 		return request_data;
 	}
 
-	/* 4 Verificar tamaño body */
+	/* NOTE: 4. Verificar tamaño body */
 	std::pair<bool, std::string> content_length_header = request->find_header( "Content-Length" );
 	if ( content_length_header.first ) {
 		
@@ -95,16 +91,17 @@ RequestData	validate_request( Client client, HTTPRequest* request ) {
 		}
 	}
 
-	/* 5. Check there is return */
+	/* NOTE: 5. Check there is return */
 	request_data.returnData = location.second->get_return();
 	if ( request_data.returnData.code != -1 ) {
 		/* Return found on location, returning request_data */
 		return request_data;
 	}
 
-	/* 6. Check request method */
-	if ( !is_supported_HTTP_method( request->get_method() ) ) {
-		// HTTP/1.1 incluye header "allow" y lista de metodos validos {GET,POST,DELETE} ???????????
+	/* NOTE: 6. Check request method */
+	/* FIXME: a page woth allow should be sent */
+	if ( !location.second->has_method( request->get_method() ) ) {
+		
 		/* Set errorData code to 405 */
 		request_data.errorData.code = 405;
 
