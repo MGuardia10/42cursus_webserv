@@ -138,7 +138,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return false;
 	}
 	
-	/* Got the full path */
+	/* NOTE: Got the full path */
 	std::pair<bool, Location const*> location = client_it->second.get_server().get_location( request->get_path() );
 	std::string	full_path;
 
@@ -152,6 +152,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	std::cout << "Alias: " << alias << std::endl;
 	std::cout << "Path: " << request->get_path() << std::endl;
 
+	/* Mkae the path takeing into account the alias of the location */
 	if (alias == "")
 		full_path = root + route + request->get_path();
 	else
@@ -179,8 +180,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		delete_method( full_path, client_it->second, request );
 
 
-	/* Delete the request data */
-	/* FIXME: the information to check on the request has to be checked previously */
+	
 	// std::cout << "Preparing response" << std::endl;
 	// std::string response;
 	// response =
@@ -210,11 +210,12 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		// 	std::cout << "Response sent" << std::endl;
 		// } while (offset != 0);
 
+	/* DEBUGGING: send a response, to close the request and dont make the client wait */
 	response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
 	send(fd, response.c_str(), response.size(), 0);
 
-	/* !SECTION */
+	/* Delete the request data */
 	delete request;
 	client_it->second.set_request(NULL);
 	return false;
