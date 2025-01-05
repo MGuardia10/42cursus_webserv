@@ -33,7 +33,7 @@ HEADERS=	default.hpp		\
 MAIN_SRC =	main.cpp		\
 			signals.cpp		\
 			process_requests.cpp \
-			validate_requests.cpp \
+			validate_requests.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 PARSE_SRC =	parse.cpp \
