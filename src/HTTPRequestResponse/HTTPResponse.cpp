@@ -284,7 +284,7 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std
 	file.read(&buffer[0], CHUNK_SIZE);
 	body = std::string(&buffer[0], buffer.size());
 
-	size_t	new_offset = (file.gcount() == CHUNK_SIZE) ? offset + CHUNK_SIZE : 0;
+	long long	new_offset = (file.gcount() == CHUNK_SIZE) ? offset + CHUNK_SIZE : 0;
 	response = (header.empty()) ? body : headers_map_to_string( header ) + body;
 
 	/* Return the response, plus headers if it is neccesary */
