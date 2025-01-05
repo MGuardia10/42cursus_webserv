@@ -35,7 +35,6 @@ HEADERS=	default.hpp		\
 MAIN_SRC =	main.cpp		\
 			signals.cpp		\
 			process_requests.cpp \
-			validate_requests.cpp
 OBJ = $(MAIN_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 PARSE_SRC =	parse.cpp \
@@ -53,7 +52,8 @@ SERVER_SRC =	ConfigBase.cpp	\
 OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 HTTPREQUESTRESPONSE_SRC =	HTTPRequest.cpp	\
-							HTTPResponse.cpp
+							HTTPResponse.cpp \
+							validate_requests.cpp
 OBJ += $(HTTPREQUESTRESPONSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 METHODS_SRC =	get_method.cpp	\
