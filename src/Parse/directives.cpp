@@ -347,6 +347,6 @@ void add_alias( std::string line, ConfigBase &item ) {
 		throw std::invalid_argument("Invalid alias directive. Alias must be one absolute path.");
 
 	/* Push alias to location */
-	line.at( line.size() - 1 ) != '/' ? location.set_alias( line ) : location.set_alias( line.substr( 0, line.size() - 1 ) );
+	location.set_alias( line );
 
 }

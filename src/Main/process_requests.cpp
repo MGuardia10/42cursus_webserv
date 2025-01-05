@@ -70,7 +70,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 
 	if (client_it == clients.end())
 		return false;
-	std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd;
+	std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd << std::endl;
 
 	/* NOTE: Save all the request */
 	HTTPRequest*	request = client_it->second.get_request();
@@ -136,6 +136,40 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		client_it->second.set_request(NULL);
 		return false;
 	}
+	
+	/* TODO: Check the method and call a function */
+	std::pair<bool, Location const*> location = client_it->second.get_server().get_location( request->get_path() );
+	std::string	full_path;
+
+	std::string alias = location.second->get_alias();
+	std::string root = location.second->get_root();
+	if (root == "")	root = ".";
+	std::string route = location.second->get_route();
+	if (route == "/") route = "";
+	std::cout << "Root: " << root << std::endl;
+	std::cout << "Route: " << route << std::endl;
+	std::cout << "Alias: " << alias << std::endl;
+	std::cout << "Path: " << request->get_path() << std::endl;
+
+	if (alias == "")
+		full_path = root + route + request->get_path();
+	else
+	{
+		/*
+			Root: /home/webserv
+			Route: /test
+			Alias: /pages
+
+			Request: /test/index.html
+			Path => /home/webserv/pages/index.html
+		*/
+
+		full_path = root + alias + std::string(&request->get_path()[alias.size()]);
+	}
+
+	std::cout << "Full path: " << full_path << std::endl;
+	
+
 
 	/* Delete the request data */
 	/* FIXME: the information to check on the request has to be checked previously */
@@ -168,11 +202,9 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		// 	std::cout << "Response sent" << std::endl;
 		// } while (offset != 0);
 
-	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
+	response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// send(fd, response.c_str(), response.size(), 0);
-
-	/* TODO: Check the method and call a function */
+	send(fd, response.c_str(), response.size(), 0);
 
 	/* !SECTION */
 	delete request;
