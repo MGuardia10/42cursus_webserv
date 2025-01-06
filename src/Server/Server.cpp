@@ -151,7 +151,6 @@ std::pair<bool, Location const*>	Server::get_location( std::string route ) const
 		if (last == route)
 			break ;
 		route = last;
-		std::cout << "\t# [" << route << "]" << std::endl;
 	};
 
 	/* The location has not been found */

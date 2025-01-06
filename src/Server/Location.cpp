@@ -54,7 +54,7 @@ std::ostream&	operator<<( std::ostream& os, Location const& printObject )
 std::string	Location::get_route( void ) const { return _route; }
 void		Location::set_route( std::string route ) { _route = route; }
 
-std::string	Location::get_alias( void ) { return _alias; }
+std::string	Location::get_alias( void ) const { return _alias; }
 void		Location::set_alias( std::string alias ) { _alias = alias; }
 
 /*==========*/

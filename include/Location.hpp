@@ -26,7 +26,7 @@ class Location : public ConfigBase
 		std::string	get_route( void ) const;
 		void		set_route( std::string route );
 
-		std::string	get_alias( void );
+		std::string	get_alias( void ) const;
 		void		set_alias( std::string alias );
 
 
