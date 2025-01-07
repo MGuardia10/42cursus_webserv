@@ -13,7 +13,7 @@ class ConfigBase
 			std::string	text;
 		};
 
-	private:
+	protected:
 		enum {
 			CLIENT_MAX_BODY_SIZE_INDEX = 0,
 			ROOT_INDEX,
@@ -23,7 +23,6 @@ class ConfigBase
 		};
 		bool	_inicializated[TOTAL_INDEX];
 
-	protected:
 		/* Error pages: <status_code, page_path> */
 		std::map<int, std::string>	_error_pages;
 
@@ -84,7 +83,7 @@ class ConfigBase
 		void								add_cgi( std::string extension, std::string path );
 
 		/* Return */
-		ReturnData const&					get_return( void ) const;
+		ReturnData const&			get_return( void ) const;
 		void						set_return( ReturnData data );
 
 		/* Methods */
