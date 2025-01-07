@@ -236,6 +236,18 @@ void						ConfigBase::add_method( std::string method )
 
 void	ConfigBase::inherit( ConfigBase const& src )
 {
+	/* Copy the client max body size */
+	if (!_inicializated[CLIENT_MAX_BODY_SIZE_INDEX])
+		_client_max_body_size = src._client_max_body_size;
+
+	/* Copy the root */
+	if (!_inicializated[ROOT_INDEX])
+		_root = src._root;
+
+	/* Copy the autoindex */
+	if (!_inicializated[AUTOINDEX_INDEX])
+		_autoindex = src._autoindex;
+
 	/* Copy the error pages */
 	for (
 		std::map<int, std::string>::const_iterator it = src._error_pages.begin();
@@ -244,16 +256,8 @@ void	ConfigBase::inherit( ConfigBase const& src )
 	)
 	{
 		if (_error_pages.find(it->first) == _error_pages.end())
-			_error_pages.insert(std::pair<int, std::string>(it->first, it->second));
+			_error_pages.insert(std::pair<int, std::string>(it->first, src._root + it->second));
 	}
-
-	/* Copy the client max body size */
-	if (!_inicializated[CLIENT_MAX_BODY_SIZE_INDEX])
-		_client_max_body_size = src._client_max_body_size;
-
-	/* Copy the root */
-	if (!_inicializated[ROOT_INDEX])
-		_root = src._root;
 
 	/* Copy the indexes */
 	for (
@@ -263,12 +267,8 @@ void	ConfigBase::inherit( ConfigBase const& src )
 	)
 	{
 		if (std::find(_indexes.begin(), _indexes.end(), *it) == _indexes.end())
-			_indexes.push_back(*it);
+			_indexes.push_back(src._root + "/" + *it);
 	}
-
-	/* Copy the autoindex */
-	if (!_inicializated[AUTOINDEX_INDEX])
-		_autoindex = src._autoindex;
 
 	/* Copy the cgis */
 	for (
