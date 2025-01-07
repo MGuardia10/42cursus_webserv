@@ -33,6 +33,8 @@ class Location : public ConfigBase
 		/* NOTE: Objects features */
 		std::string	print( void ) const;
 
+		void inherit( ConfigBase const& src);
+
 		/* NOTE: Exceptions */
 
 };
