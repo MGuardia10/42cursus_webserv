@@ -203,9 +203,9 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		// } while (offset != 0);
 
 	/* DEBUGGING: send a response, to close the request and dont make the client wait */
-	response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
+	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
 	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	send(fd, response.c_str(), response.size(), 0);
+	// send(fd, response.c_str(), response.size(), 0);
 
 	/* Delete the request data */
 	delete request;
