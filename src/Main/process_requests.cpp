@@ -157,7 +157,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		std::string path = request->get_path().replace( 0 , route.size(), ""  );
 		
 		/* Create full path */
-		full_path = root + alias + path; // retocar LUIS LO HIZO MAL, ya etsa arreglado pro el grandioso Miguel aka mguardia xd lol jaja
+		full_path = root + alias + path;
 		
 		/* remove last "/" */
 		full_path = (full_path.at( full_path.size() - 1 ) == '/' ) ? full_path.substr( 0, full_path.size() - 1 ) : full_path;
