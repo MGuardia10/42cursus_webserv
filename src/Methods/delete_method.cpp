@@ -2,6 +2,8 @@
 #include "../../include/HTTPResponse.hpp"
 #include <sys/stat.h>
 #include <netinet/in.h>
+#include <dirent.h>
+#include <unistd.h>
 
 /**
  * @brief Function to check the modes that an item/folder has
@@ -11,10 +13,11 @@
  * 					is null, no information is saved
  * @param	mode Mode to check on the item
  * 
- * @return true if the item has the mode; false otherwise. Also, if there is any problem
- * 			searching the item on the path, false is also returned
+ * @return The function return a pair of bools: The first value indicates
+ * 			if the file exists; if it does, the second value indicates
+ *			if has the mode of the parameter
  */
-static bool	check_mode( std::string path, struct stat *data, mode_t mode )
+static std::pair<bool, bool>	check_mode( std::string path, struct stat *data, mode_t mode )
 {
 	struct stat aux;
 
@@ -23,10 +26,10 @@ static bool	check_mode( std::string path, struct stat *data, mode_t mode )
 
 	/* Get the file info */
 	if ( stat( path.c_str(), data ) == -1 )
-		return false;
+		return std::pair<bool, bool>(false, false);
 	
 	/* Check the mode */
-	return (data->st_mode & mode) != 0;
+	return std::pair<bool, bool>(true, (data->st_mode & mode) != 0);
 }
 
 static void	delete_send( Client& client, int code, std::string page_path, HTTPRequest *request )
@@ -56,17 +59,38 @@ void	delete_method( std::string path, Client& client, HTTPRequest* request)
 	std::cout << "Path recieved: " << path << std::endl;
 
 	/* NOTE: 1. Check if the item has write mode; otherwise, return a 403 response */
-	if (!check_mode( path, &file_data, S_IWUSR ))
+	std::pair<bool, bool> file_status = check_mode( path, &file_data, S_IWUSR );
+	if (!file_status.first)
 	{
-		/* Find the 403 page */
-		std::string page = server.get_error_page( 403 );
-
-		/* Send the data */
-		delete_send( client, 403, page, request);
+		delete_send( client, 404, server.get_error_page( 404 ), request );
+		return ;
+	}
+	if (!file_status.second)
+	{
+		delete_send( client, 403, server.get_error_page( 403 ), request) ;
+		return ;
 	}
 
-	std::cout << "OKers" << std::endl;
+	/* NOTE: 2. Check what type of item is (file or folder) */
+	if (!S_ISDIR(file_data.st_mode))
+	{
+		remove( path.c_str() );
+		delete_send( client, 200, server.get_error_page( 200 ), request );
+	}
+	else
+	{
+		DIR* directory = opendir( path.c_str() );
+		readdir(directory);
+		readdir(directory);
+		if (!readdir(directory))
+		{
+			rmdir( path.c_str() );
+			delete_send( client, 200, server.get_error_page( 200 ), request );
+		}
+		else
+			delete_send( client, 409, server.get_error_page( 409 ), request );
 
-	/* TODO: 2. Check what type of item is (file or folder) */
+		closedir(directory);
+	}
 
 }
