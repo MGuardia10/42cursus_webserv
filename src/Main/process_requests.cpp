@@ -163,9 +163,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		full_path = (full_path.at( full_path.size() - 1 ) == '/' ) ? full_path.substr( 0, full_path.size() - 1 ) : full_path;
 	}
 
-	std::cout << "Full path: " << full_path << std::endl;
-	
-	/* TODO: Check the method and call a function */
+	/* NOTE: Check the method and call a function */
 	if (request->get_method() == "GET")
 		get_method( full_path, client_it->second, request );
 	else if (request->get_method() == "POST")

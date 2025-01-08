@@ -56,8 +56,6 @@ void	delete_method( std::string path, Client& client, HTTPRequest* request)
 	struct stat file_data;
 	const Server server = client.get_server();
 
-	std::cout << "Path recieved: " << path << std::endl;
-
 	/* NOTE: 1. Check if the item has write mode; otherwise, return a 403 response */
 	std::pair<bool, bool> file_status = check_mode( path, &file_data, S_IWUSR );
 	if (!file_status.first)
