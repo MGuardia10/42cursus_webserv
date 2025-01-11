@@ -15,6 +15,7 @@ void	error_send( Client& client, int code, std::string page_path, HTTPRequest *r
 		offset = response.first;
 
 		/* Send the page fragment */
-		send( client.get_fd(), response.second.c_str(), response.second.size(), 0);
+		if (send( client.get_fd(), response.second.c_str(), response.second.size(), MSG_NOSIGNAL) == -1)
+			break ;
 	} while (offset != 0);
 }

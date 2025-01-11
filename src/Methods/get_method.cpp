@@ -23,7 +23,8 @@ void	get_send( int code, std::string& path, Client& client,  HTTPRequest* reques
 		// std::cout << "$$$$$$$$$$$$$$$$$$\n\n";
 
 		/* Send response */
-		send(client.get_fd(), response.c_str(), response.size(), 0);
+		if (send(client.get_fd(), response.c_str(), response.size(), MSG_NOSIGNAL) == -1)
+			break ;
 
 	} while (offset != 0);
 
@@ -76,7 +77,7 @@ void	get_method( std::string path, Client& client, HTTPRequest* request)
 			std::string autoindex_response = HTTPResponse::get_autoindex_response( path, client.get_cookie() );
 
 			/* Send autoindex resonse */
-			send( client.get_fd(), autoindex_response.c_str(), autoindex_response.size(), 0 );
+			send( client.get_fd(), autoindex_response.c_str(), autoindex_response.size(), MSG_NOSIGNAL );
 			return ;
 		}
 
