@@ -1,0 +1,73 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+        }
+        .video-background{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        h1 {
+            font-size: 4rem;
+            color: #dc3545;
+        }
+        p {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+			color: rgb(187, 182, 182);
+        }
+        b {
+            color: white;
+        }
+        .illustration {
+            font-size: 5rem;
+            margin: 1rem 0;
+        }
+		.team-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+		}
+		.team-item img {
+			max-width: 150px;
+			height: auto;
+			border-radius: 50%;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			margin-bottom: 10px;
+		}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <video class="video-background" muted autoplay loop>
+            <source src="../assets/background.mp4" type="video/mp4">
+        </video>
+		<div class="team-item">
+			<img src="../assets/abarrio.jpeg" alt="team member Angela">
+    	</div>
+        <h1>404 - Not Found</h1>
+		<p>Oops! The page you're looking for cannot be found, like <b>@abarrio-</b></p>
+	</div>
+</body>
+</html>
