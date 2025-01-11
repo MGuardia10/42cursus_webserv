@@ -174,16 +174,23 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	// else /* DELETE */
 	// 	delete_method( full_path, client_it->second, request );
 	
-	/* DEBUGGING: CGI form example */
+	/* DEBUGGING: Form examples */
 	// std::string response2;
 	// response2 =
 	// 	"HTTP/1.1 200 OK\r\n"
 	// 	"Content-Type: text/html\r\n"
 	// 	"Connection: keep-alive\r\n"
 	// 	"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
+		/* DEBUGGING: CGI*/
 	// 	"Content-Length: 179\r\n"
 	// 	"\r\n"
 	// 	"<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
+		/* DEBUGGING: Files*/
+	// "Content-Length: 210\r\n"
+	// 	"\r\n"
+	// "<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
+
+
 	// send(fd, response2.c_str(), response2.size(), 0);
 
 	/* Delete the request data */
