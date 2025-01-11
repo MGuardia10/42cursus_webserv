@@ -167,13 +167,25 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	}
 
 	/* NOTE: Check the method and call a function */
-	if (request->get_method() == "GET")
-		get_method( full_path, client_it->second, request );
-	else if (request->get_method() == "POST")
-		post_method( full_path, client_it->second, request );
-	else /* DELETE */
-		delete_method( full_path, client_it->second, request );
+	// if (request->get_method() == "GET")
+	// 	get_method( full_path, client_it->second, request );
+	// else if (request->get_method() == "POST")
+	// 	post_method( full_path, client_it->second, request );
+	// else /* DELETE */
+	// 	delete_method( full_path, client_it->second, request );
 	
+	/* DEBUGGING: CGI form example */
+	// std::string response2;
+	// response2 =
+	// 	"HTTP/1.1 200 OK\r\n"
+	// 	"Content-Type: text/html\r\n"
+	// 	"Connection: keep-alive\r\n"
+	// 	"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
+	// 	"Content-Length: 179\r\n"
+	// 	"\r\n"
+	// 	"<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
+	// send(fd, response2.c_str(), response2.size(), 0);
+
 	/* Delete the request data */
 	delete request;
 	client_it->second.set_request(NULL);
