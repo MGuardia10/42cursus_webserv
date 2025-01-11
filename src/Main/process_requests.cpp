@@ -138,22 +138,31 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return false;
 	}
 	
-	/* NOTE: Got the full path */
+	/* NOTE: Get the full path */
 	std::pair<bool, Location const*> location = client_it->second.get_server().get_location( request->get_path() );
 	std::string	full_path;
 
-	std::string alias = location.second->get_alias();
 	std::string root = location.second->get_root();
 	if (root == "")	root = ".";
 	std::string route = location.second->get_route();
-	if (route == "/") route = "";
+	// if (route == "/") route = "";
+	std::string alias = location.second->get_alias();
 
-	/* Mkae the path takeing into account the alias of the location */
-	if (alias == "")
-		full_path = root + route + request->get_path();
-	else
-	{
-		/* Get path withoute route to insert alias */
+	std::cout << "root [" << root << "]" << '\n';
+	std::cout << "route [" << route << "]" << '\n';
+	std::cout << "alias [" << alias << "]" << '\n';
+	std::cout << "request [" << request->get_path() << "]" << '\n';
+
+
+	/* Make the path taking into account the alias of the location */
+	if (alias == "") {
+		if ( route == request->get_path() )
+			full_path = root + route;
+		else
+			full_path = root + route + request->get_path().replace( 0 , route.size(), ""  );
+	}
+	else {
+		/* Get path without route to insert alias */
 		std::string path = request->get_path().replace( 0 , route.size(), ""  );
 		
 		/* Create full path */
@@ -185,20 +194,6 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
 	// std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
 
-		// /* Set offset */
-		// long long offset = 0;
-
-		// /* Loop until offset 0 again */
-		// do
-		// {
-		// 	std::pair<long long, std::string> data = HTTPResponse::get_file_response( 200, "pages/assets/abarrio.jpeg", client_it->second.get_cookie(), offset );
-		// 	offset = data.first;
-		// 	response = data.second;
-
-		// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-		// 	send(fd, response.c_str(), response.size(), 0);
-		// 	std::cout << "Response sent" << std::endl;
-		// } while (offset != 0);
 
 	/* DEBUGGING: send a response, to close the request and dont make the client wait */
 	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );

@@ -67,21 +67,28 @@ void Location::inherit( ConfigBase const& src)
 {
 	/* Get the location full path */
 	std::string path = (_inicializated[ROOT_INDEX] ? _root : src.get_root());
-	if (path[path.size() - 1] == '/')
-		path = path.substr(0, path.size() - 1);
 	path += (_alias != "" ? _alias : _route);
 
 	/* Repush te error pages */
 	for (std::map<int, std::string>::iterator it = _error_pages.begin(); it != _error_pages.end(); it++)
-		it->second = path + it->second;
+	{
+		if (path[path.size() - 1] == '/')
+			it->second = path + it->second.substr(1, it->second.size());
+		else
+			it->second = path + it->second;
+	}
 
 	/* Repush te error indexes */
 	for (std::vector<std::string>::iterator it = _indexes.begin(); it != _indexes.end(); it++)
-		*it = path + *it;
+	{
+		if (path[path.size() - 1] == '/')
+			*it = path + *it;
+		else
+			*it = path + std::string("/") + *it;
+	}
 
 	static_cast<ConfigBase*>(this)->inherit( src );
 }
-
 /*==========*/
 /* !SECTION */
 /*==========*/
