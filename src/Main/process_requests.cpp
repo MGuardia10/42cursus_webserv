@@ -167,12 +167,12 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	}
 
 	/* NOTE: Check the method and call a function */
-	// if (request->get_method() == "GET")
-	// 	get_method( full_path, client_it->second, request );
-	// else if (request->get_method() == "POST")
-	// 	post_method( full_path, client_it->second, request );
-	// else /* DELETE */
-	// 	delete_method( full_path, client_it->second, request );
+	if (request->get_method() == "GET")
+		get_method( full_path, client_it->second, request );
+	else if (request->get_method() == "POST")
+		post_method( full_path, client_it->second, request );
+	else /* DELETE */
+		delete_method( full_path, client_it->second, request );
 	
 	/* DEBUGGING: Form examples */
 	// std::string response2;

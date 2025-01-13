@@ -18,10 +18,6 @@ void	get_send( int code, std::string& path, Client& client,  HTTPRequest* reques
 		offset = data.first;
 		response = data.second;
 
-		// std::cout << "response: $$$$$$$$$$$$$$$$$$\n";
-		// std::cout << response <<"\n";
-		// std::cout << "$$$$$$$$$$$$$$$$$$\n\n";
-
 		/* Send response */
 		if (send(client.get_fd(), response.c_str(), response.size(), MSG_NOSIGNAL) == -1)
 			break ;
