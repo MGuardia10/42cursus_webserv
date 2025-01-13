@@ -74,6 +74,9 @@ void add_root( std::string line, ConfigBase &item ) {
 	if ( !is_valid_absolute_path( line ) )
 		throw std::invalid_argument("Invalid root directive. Root must be one absolute path.");
 
+	// if ( line == "/" )
+	// 	item.set_root( line );
+	// else
 	line.at( line.size() - 1 ) != '/' ? item.set_root( line ) : item.set_root( line.substr( 0, line.size() - 1 ) );
 
 }
@@ -347,6 +350,9 @@ void add_alias( std::string line, ConfigBase &item ) {
 		throw std::invalid_argument("Invalid alias directive. Alias must be one absolute path.");
 
 	/* Push alias to location */
-	location.set_alias( line );
+	if ( line == "/" )
+		location.set_alias( line );
+	else
+		line.at( line.size() - 1 ) != '/' ? location.set_alias( line ) : location.set_alias( line.substr( 0, line.size() - 1 ) );
 
 }

@@ -58,7 +58,9 @@ OBJ += $(HTTPREQUESTRESPONSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 METHODS_SRC =	get_method.cpp	\
 				post_method.cpp	\
-				delete_method.cpp
+				delete_method.cpp \
+				check_mode.cpp \
+				error_send.cpp
 OBJ += $(METHODS_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 #####################################################################################################################

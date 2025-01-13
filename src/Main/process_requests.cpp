@@ -104,7 +104,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		/* Get response */
 		response = HTTPResponse::get_return_response( &request_data.returnData, client_it->second.get_cookie() );
 
-		send(fd, response.c_str(), response.size(), 0);
+		send(fd, response.c_str(), response.size(), MSG_NOSIGNAL);
 		
 		/* Return false */
 		delete request;
@@ -129,7 +129,8 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 			response = data.second;
 
 			/* Send response */
-			send(fd, response.c_str(), response.size(), 0);
+			if (send(fd, response.c_str(), response.size(), MSG_NOSIGNAL) == -1)
+				break ;
 
 		} while (offset != 0);
 
@@ -138,22 +139,24 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		return false;
 	}
 	
-	/* NOTE: Got the full path */
+	/* NOTE: Get the full path */
 	std::pair<bool, Location const*> location = client_it->second.get_server().get_location( request->get_path() );
 	std::string	full_path;
 
-	std::string alias = location.second->get_alias();
 	std::string root = location.second->get_root();
 	if (root == "")	root = ".";
 	std::string route = location.second->get_route();
-	if (route == "/") route = "";
+	std::string alias = location.second->get_alias();
 
-	/* Mkae the path takeing into account the alias of the location */
-	if (alias == "")
-		full_path = root + route + request->get_path();
-	else
-	{
-		/* Get path withoute route to insert alias */
+	/* Make the path taking into account the alias of the location */
+	if (alias == "") {
+		if ( route == request->get_path() )
+			full_path = root + route;
+		else
+			full_path = root + route + request->get_path().replace( 0 , route.size(), ""  );
+	}
+	else {
+		/* Get path without route to insert alias */
 		std::string path = request->get_path().replace( 0 , route.size(), ""  );
 		
 		/* Create full path */
@@ -164,46 +167,31 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	}
 
 	/* NOTE: Check the method and call a function */
-	if (request->get_method() == "GET")
-		get_method( full_path, client_it->second, request );
-	else if (request->get_method() == "POST")
-		post_method( full_path, client_it->second, request );
-	else /* DELETE */
-		delete_method( full_path, client_it->second, request );
+	// if (request->get_method() == "GET")
+	// 	get_method( full_path, client_it->second, request );
+	// else if (request->get_method() == "POST")
+	// 	post_method( full_path, client_it->second, request );
+	// else /* DELETE */
+	// 	delete_method( full_path, client_it->second, request );
 	
-	// std::cout << "Preparing response" << std::endl;
-	// std::string response;
-	// response =
+	/* DEBUGGING: Form examples */
+	// std::string response2;
+	// response2 =
 	// 	"HTTP/1.1 200 OK\r\n"
 	// 	"Content-Type: text/html\r\n"
 	// 	"Connection: keep-alive\r\n"
 	// 	"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
-	// 	"Content-Length: 210\r\n"
-	// 	// "Content-Length: 179\r\n"
+		/* DEBUGGING: CGI*/
+	// 	"Content-Length: 179\r\n"
 	// 	"\r\n"
-	// 	"<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
-		// "<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
-	// std::string response = HTTPResponse::get_response_template( 200, "Test de template", client_it->second.get_cookie());
+	// 	"<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
+		/* DEBUGGING: Files*/
+	// "Content-Length: 210\r\n"
+	// 	"\r\n"
+	// "<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
 
-		// /* Set offset */
-		// long long offset = 0;
 
-		// /* Loop until offset 0 again */
-		// do
-		// {
-		// 	std::pair<long long, std::string> data = HTTPResponse::get_file_response( 200, "pages/assets/abarrio.jpeg", client_it->second.get_cookie(), offset );
-		// 	offset = data.first;
-		// 	response = data.second;
-
-		// 	std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-		// 	send(fd, response.c_str(), response.size(), 0);
-		// 	std::cout << "Response sent" << std::endl;
-		// } while (offset != 0);
-
-	/* DEBUGGING: send a response, to close the request and dont make the client wait */
-	// response = HTTPResponse::get_autoindex_response( "." + request->get_path(), client_it->second.get_cookie() );
-	// std::cout << "RESPONSE:\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n" << response << "\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" << std::endl;
-	// send(fd, response.c_str(), response.size(), 0);
+	// send(fd, response2.c_str(), response2.size(), 0);
 
 	/* Delete the request data */
 	delete request;
@@ -279,7 +267,7 @@ void	process_requests(std::vector<Server> servers_vector)
 	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); it++)
 	{
 		response = HTTPResponse::get_close_connection_template(it->second.get_cookie());
-		send(it->first, response.c_str(), response.size(), 0);
+		send(it->first, response.c_str(), response.size(), MSG_NOSIGNAL);
 		close(it->first);
 	}
 	/* TODO: Close the CGIs pipes */
