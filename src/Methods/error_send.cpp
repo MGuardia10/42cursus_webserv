@@ -2,8 +2,9 @@
 
 void	error_send( Client& client, int code, std::string page_path, HTTPRequest *request )
 {
-	/* Remove the body file */
-	request->remove_body_file();
+	/* Remove the body file (except 201 status code) */
+	if ( code != 201 )
+		request->remove_body_file();
 
 	/* Read the page until the reads ends */
 	std::pair<int, std::string> response;

@@ -348,9 +348,6 @@ void	HTTPRequest::move_body_file(std::string const& dest_path)
 	/* Check if there is any file */
 	if (_body_filename != "")
 	{	
-		std::cout << "destpath ==" << dest_path << "\n";
-		std::cout << "body filename ==" << _body_filename << "\n";
-
 		/* Remove the dest file */
 		std::remove(dest_path.c_str());
 

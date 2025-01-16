@@ -51,17 +51,19 @@ void	post_method( std::string path, Client& client, HTTPRequest* request)
 				dest_filename = new_path + request->get_filename();
 			else
 				dest_filename = new_path + request->get_filename().substr( request->get_filename().find_last_of('/') + 1 );
-
 		}
-			
+		
+		/* Change file path */
 		request->move_body_file( dest_filename );
+
+		/* Return response OK */
+		error_send( client, 201, location.second->get_error_page( 201 ), request );
 
 	} else {
 
 		/* NOTE: 2.2. Case is CGI */
 		/* TODO */
 	}
-
 
 	std::cout << "path [" << path << "]" << '\n';
 

@@ -7,3 +7,4 @@ bin/
 
 # Executable
 webserv
+.DS_Store
