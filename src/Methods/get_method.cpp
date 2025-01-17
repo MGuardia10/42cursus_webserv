@@ -69,8 +69,7 @@ void	get_method( std::string path, Client& client, HTTPRequest* request)
 
 		/* NOTE: 2.4. Check autoindex */
 		if ( location.second->get_autoindex() ) {
-
-			std::string autoindex_response = HTTPResponse::get_autoindex_response( path, client.get_cookie() );
+			std::string autoindex_response = HTTPResponse::get_autoindex_response( path, request->get_path(), client.get_cookie() );
 
 			/* Send autoindex resonse */
 			send( client.get_fd(), autoindex_response.c_str(), autoindex_response.size(), MSG_NOSIGNAL );

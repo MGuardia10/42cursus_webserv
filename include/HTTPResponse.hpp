@@ -124,5 +124,5 @@ class HTTPResponse
 		 * 
 		 * @return The correct response
 		 */
-		static std::string	get_autoindex_response( std::string path, std::string cookie );
+		static std::string	get_autoindex_response( std::string path, std::string request_path, std::string cookie );
 };

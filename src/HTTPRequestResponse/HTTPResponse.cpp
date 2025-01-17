@@ -338,7 +338,7 @@ std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int cod
 }
 
 /** Function to generate the autoindex of a specific path */
-std::string	HTTPResponse::get_autoindex_response( std::string path, std::string cookie )
+std::string	HTTPResponse::get_autoindex_response( std::string path, std::string request_path, std::string cookie )
 {
 	std::string	head, body = "";
 	std::map<std::string, std::string> header;
@@ -383,7 +383,7 @@ std::string	HTTPResponse::get_autoindex_response( std::string path, std::string 
 		contents.push_back(std::pair< dirent*, std::pair<std::string, std::string> >(it->first, std::pair<std::string, std::string>("Files", it->second)));
 
 	/* Print a table with all the file data */
-	head = "<head><title>" + path + " autoindex - Webserv</title><style>"
+	head = "<head><title>" + request_path + " autoindex - Webserv</title><style>"
 		"body {\nfont-family: Arial, sans-serif;\nmargin: 20px;\nbackground-color: #f9f9f9;\n}\n"
 		"table {\nwidth: 100%;\nborder-collapse: collapse;\nmargin: 20px 0;\nbackground-color: #ffffff;\nbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\n}\n"
 		"thead {\nbackground-color: #007bff;\ncolor: white;\n}\n"
@@ -395,12 +395,12 @@ std::string	HTTPResponse::get_autoindex_response( std::string path, std::string 
 		"a {\ncolor: #007bff;\ntext-decoration: none;\nfont-weight: bold;\ntransition: color 0.3s, text-decoration 0.3s;\n}\n"
 		"a:hover {\ncolor: #0056b3;\ntext-decoration: underline;\n}\n"
 	"</style></head>";
-	body = "<body><h1>Index of " + path + "</h1><hr><table><thead><tr><th>Name</th><th>Type</th><th>Size (bytes)</th></tr></thead><tbody>";
+	body = "<body><h1>Index of " + request_path + "</h1><hr><table><thead><tr><th>Name</th><th>Type</th><th>Size (bytes)</th></tr></thead><tbody>";
 
 	for (std::vector< std::pair< dirent*, std::pair<std::string, std::string> > >::iterator it = contents.begin(); it != contents.end(); it++)
 	{
 		std::string href = std::string(it->first->d_name) + (it->second.first == "Folder" ? "/" : "");
-		body += "<tr><td><a href=\"" + href + "\">" + href + "</a></td><td>" + it->second.first + "</td><td>" + it->second.second + "</td></tr>";
+		body += "<tr><td><a href=\"" + request_path + (request_path[request_path.size() - 1] == '/' ? "" : "/") + href + "\">" + href + "</a></td><td>" + it->second.first + "</td><td>" + it->second.second + "</td></tr>";
 	}
 
 	body += "</tbody></body></html>";
