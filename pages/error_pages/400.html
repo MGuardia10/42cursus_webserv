@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>400 - Bad Request</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+        }
+		.video-background{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+        h1 {
+            font-size: 4rem;
+            color: #dc3545;
+        }
+        p {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+			color: rgb(187, 182, 182);
+        }
+        .illustration {
+            font-size: 5rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+		<video class="video-background" muted autoplay loop>
+            <source src="../assets/background.mp4" type="video/mp4">
+        </video>
+        <div class="illustration">❓</div>
+        <h1>403 - Bad Request</h1>
+        <p>Oops! Your request was invalid. Please check and try again.</p>
+    </div>
+</body>
+</html>

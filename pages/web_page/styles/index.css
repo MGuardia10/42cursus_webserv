@@ -31,3 +31,12 @@
     font-size: 18px;
     text-align: center;
 }
+
+.btn-form{
+    margin-top: 10px;
+    color: #5C5C5C;
+}
+
+.btn-form:hover{
+    color: purple;
+}
