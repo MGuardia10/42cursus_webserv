@@ -82,7 +82,7 @@ header{
     color: var(--blue);
     letter-spacing: 1px;
 }
-  .btn-ghost.secundary:hover{
+.btn-ghost.secundary:hover{
     background-color: var(--blue);
     color: var(--white);
 }
