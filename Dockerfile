@@ -6,7 +6,7 @@ RUN     apt update && apt upgrade -y
 
 # Time Zone Configuration (avoiding valgrind prompt)
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y tzdata \
+RUN apt-get update && apt-get install -y tzdata curl \
     && ln -fs /usr/share/zoneinfo/Etc/UTC /etc/localtime \
     && dpkg-reconfigure --frontend noninteractive tzdata
 
