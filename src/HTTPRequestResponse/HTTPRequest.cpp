@@ -349,10 +349,31 @@ void	HTTPRequest::move_body_file(std::string const& dest_path)
 	if (_body_filename != "")
 	{	
 		/* Remove the dest file */
-		remove(dest_path.c_str());
+		std::remove(dest_path.c_str());
 
 		/* Change the name of out current file */
-		std::rename(_body_filename.c_str(), dest_path.c_str());
+		std::ifstream src(_body_filename.c_str(), std::ios::binary);
+        if (!src) {
+            std::cerr << "Error: Cannot open _body_filename to read." << std::endl;
+            return;
+        }
+
+        /* Open the destination file */
+        std::ofstream dst(dest_path.c_str(), std::ios::binary);
+        if (!dst) {
+            std::cerr << "Error: Cannot open dest file to write." << std::endl;
+            return;
+        }
+
+        /* Copy the contents from source to destination */
+        dst << src.rdbuf();
+
+        /* Close both files */
+        src.close();
+        dst.close();
+
+        /* Remove the original file */
+        remove(_body_filename.c_str());
 
 		/* Save the new name */
 		_body_filename = dest_path;
