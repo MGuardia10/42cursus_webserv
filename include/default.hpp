@@ -35,3 +35,13 @@
 
 /* Extensions path */
 # define EXTENSIONS_PATH "src/HTTPRequestResponse/extensions.csv"
+
+/******************/
+/* NOTE: Timeouts */
+/******************/
+
+/* Poll timeout (seconds)*/
+# define POLL_TIMEOUT 1
+
+/* CGI timeout (seconds) */
+# define CGI_TIMEOUT 5
