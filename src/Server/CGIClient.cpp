@@ -1,4 +1,5 @@
 #include "../../include/CGIClient.hpp"
+#include "../../include/default.hpp"
 #include <unistd.h>
 #include <sstream>
 
@@ -6,17 +7,21 @@
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
 
-CGIClient::CGIClient( Client const& client, pid_t pid, int pipe_fd ) :
+CGIClient::CGIClient( Client const& client, pid_t pid, int pipe_fd, HTTPRequest *request ) :
 	_client(client),
 	_pid(pid),
-	_pipe_fd(pipe_fd)
+	_pipe_fd(pipe_fd),
+	_request(request)
 {
-	_start_time = clock();
+	_start_time = time(NULL);
 }
 
 CGIClient::~CGIClient( void )
 {
 	close(_pipe_fd);
+
+	_request->remove_body_file();
+	delete _request;
 }
 
 /*==========*/
@@ -69,12 +74,20 @@ Client const&	CGIClient::get_client( void ) const { return _client; }
 pid_t			CGIClient::get_pid( void ) const { return _pid; }
 int				CGIClient::get_pipe_fd( void ) const { return _pipe_fd; }
 time_t			CGIClient::get_start_time( void ) const { return _start_time; }
+HTTPRequest*	CGIClient::get_request( void ) const { return _request; }
 
 /*==========*/
 /* !SECTION */
 /*============================================================================*/
 /* SECTION:                      Object features                              */
 /*============================================================================*/
+
+bool	CGIClient::has_timeout( void ) const
+{
+	time_t	current = time(NULL);
+
+	return current - _start_time > static_cast<time_t>(CGI_TIMEOUT);
+}
 
 /*==========*/
 /* !SECTION */
