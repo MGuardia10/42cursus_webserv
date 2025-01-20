@@ -391,6 +391,30 @@ void	process_requests(std::vector<Server> servers_vector)
 		}
 	}
 
+	/* Close the actives cgis */
+	bool changes;
+	do
+	{
+		changes = false;
+		for (std::map<int, CGIClient*>::iterator it = cgis.begin(); it != cgis.end(); it++)
+		{
+			CGIClient* current_cgi = it->second;
+
+			/* Close the process */
+			kill(current_cgi->get_pid(), SIGTERM);
+			if (waitpid(current_cgi->get_pid(), NULL, WNOHANG) == 0)
+			{
+				kill(current_cgi->get_pid(), SIGKILL);
+				waitpid(current_cgi->get_pid(), NULL, WNOHANG);
+			}
+
+			/* Return a 504 */
+			error_send( current_cgi->get_client(), 504, current_cgi->get_location()->get_error_page(504), current_cgi->get_request() );
+			remove_cgiclients( it->first, pollfds, cgis );
+			break ;
+		}
+	} while (changes);
+
 	/* NOTE: Close the client fds, sending a close response */
 	std::string response;
 	for (std::map<int, Client>::iterator it = clients.begin(); it != clients.end(); it++)
@@ -399,5 +423,5 @@ void	process_requests(std::vector<Server> servers_vector)
 		send(it->first, response.c_str(), response.size(), MSG_NOSIGNAL);
 		close(it->first);
 	}
-	/* TODO: Close the CGIs pipes */
+	
 }
