@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<title>Webserv - CGI ADD</title>
+			<link rel="stylesheet" href="/web_page/styles/global.css">
+			<link rel="stylesheet" href="/web_page/styles/cgi.css">
+			<script src="https://kit.fontawesome.com/a32abd5193.js" crossorigin="anonymous"></script>
+		</head>
+	</head>
+	<body>
+		<header>
+			<video class="video-background" muted autoplay loop>
+				<source src="/assets/background.mp4" type="video/mp4">
+			</video>
+			<div class="cover">
+				<div class="cover-content">
+					<div class="cover-text">
+						<h1>CGI - Add</h1>
+						<p>Try adding two numbers</p>
+						<form action="/cgi/add.py" method="POST">
+							<input required type="text" name="N1" placeholder="Enter number 1">
+							<input required type="text" name="N2" placeholder="Enter number 2">
+							<button type="submit">Submit</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</header>
+	</body>
+</html>
+

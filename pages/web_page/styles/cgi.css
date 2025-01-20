@@ -1,0 +1,79 @@
+.cover{
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cover-content{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    gap: 100px;
+}
+
+.cover-text{
+	display: flex;
+	flex-direction: column;
+    text-align: center;
+}
+
+.cover-text p{
+    color: #5C5C5C;
+    font-size: 18px;
+    text-align: center;
+	margin-top: 20px;
+	margin-bottom: 50px;
+}
+
+form {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: rgba(0, 0, 0, 0.6); /* Fondo semitransparente */
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+	backdrop-filter: blur(10px); /* Efecto de desenfoque */
+}
+
+form input {
+	width: 80%;
+	padding: 10px;
+	margin: 10px 0;
+	font-size: 1.2em;
+	border: 2px solid #fff;
+	border-radius: 5px;
+	outline: none;
+	background-color: rgba(255, 255, 255, 0.2); /* Fondo semitransparente */
+	color: #fff;
+	transition: border-color 0.3s ease;
+}
+
+form input:focus {
+	border-color: #00b4d8;
+}
+
+form button {
+	padding: 10px 20px;
+	margin-top: 20px;
+	font-size: 1.2em;
+	color: #fff;
+	background-color: #4267c5;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+	background-color: #597acb;
+}
+
+form button:active {
+	transform: scale(0.95);
+}

@@ -383,7 +383,7 @@ std::string	HTTPResponse::get_autoindex_response( std::string path, std::string 
 		contents.push_back(std::pair< dirent*, std::pair<std::string, std::string> >(it->first, std::pair<std::string, std::string>("Files", it->second)));
 
 	/* Print a table with all the file data */
-	head = "<head><title>" + request_path + " autoindex - Webserv</title><style>"
+	head = "<html><head><title>" + request_path + " autoindex - Webserv</title><style>"
 		"body {\nfont-family: Arial, sans-serif;\nmargin: 20px;\nbackground-color: #f9f9f9;\n}\n"
 		"table {\nwidth: 100%;\nborder-collapse: collapse;\nmargin: 20px 0;\nbackground-color: #ffffff;\nbox-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);\n}\n"
 		"thead {\nbackground-color: #007bff;\ncolor: white;\n}\n"
@@ -415,6 +415,29 @@ std::string	HTTPResponse::get_autoindex_response( std::string path, std::string 
 
 	/* Mix all */
 	closedir( folder );
+
+	return headers_map_to_string( header ) + body;
+}
+
+/** Function to generate a response with a cgi data */
+std::string HTTPResponse::get_cgi_data_response( std::string data, std::string cookie )
+{
+	std::map<std::string, std::string> header;
+	std::string body, head;
+
+	head = "<html><head><title>CGI result</title></head>";
+	body = "<body><p>" + data + "</p></body></html>";
+	body = head + body;
+
+	/* Complete the headers */
+	std::stringstream ss;
+	header = get_default_headers( 200, cookie );
+
+	ss.str("");
+	ss << body.size();
+	header["Content-Type"] = "text/html";
+	header["Content-Length"] = ss.str();
+
 	return headers_map_to_string( header ) + body;
 }
 

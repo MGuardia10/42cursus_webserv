@@ -29,7 +29,8 @@ HEADERS=	default.hpp		\
 			Client.hpp		\
 			HTTPRequest.hpp	\
 			HTTPResponse.hpp	\
-			methods.hpp
+			methods.hpp	\
+			CGIClient.hpp
 
 # NOTE: Source files
 MAIN_SRC =	main.cpp		\
@@ -48,7 +49,8 @@ OBJ += $(PARSE_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 SERVER_SRC =	ConfigBase.cpp	\
 				Location.cpp	\
 				Server.cpp		\
-				Client.cpp
+				Client.cpp		\
+				CGIClient.cpp
 OBJ += $(SERVER_SRC:%.cpp=$(OBJ_FOLDER)/%.o)
 
 HTTPREQUESTRESPONSE_SRC =	HTTPRequest.cpp	\

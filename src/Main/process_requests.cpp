@@ -6,6 +6,7 @@
 #include "../../include/HTTPRequest.hpp"
 #include "../../include/HTTPResponse.hpp"
 #include "../../include/methods.hpp"
+#include "../../include/default.hpp"
 #include <poll.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,6 +16,30 @@
 #include <algorithm>
 #include <unistd.h>
 #include <fcntl.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+static void	remove_cgiclients( int fd, std::vector<pollfd>& fds, std::map<int, CGIClient*>& cgis)
+{
+	/* Remove for the pollfd vector */
+	for (std::vector<pollfd>::iterator it = fds.begin(); it != fds.end(); it++ )
+	{
+		if ( (*it).fd == fd )
+		{
+			fds.erase(it);
+			break ;
+		}
+	}
+
+	/* Remove from the map */
+	std::map<int, CGIClient*>::iterator current = cgis.find( fd );
+	if (current == cgis.end())
+		return ;
+	CGIClient*	cgi = current->second;
+	close( cgi->get_pipe_fd() );
+	delete cgi;
+	cgis.erase( current );
+}
 
 /**
  * @brief Funtion to save the new servers connections
@@ -26,7 +51,7 @@
  * 
  * @return true if a connection has been added, false otherwise
 */
-bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::map<int, Client>& clients, std::vector<pollfd>& pollfds )
+static bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::map<int, Client>& clients, std::vector<pollfd>& pollfds )
 {
 	std::map<int, Server>::iterator server_it = servers.find(fd);
 	if (server_it == servers.end())
@@ -62,15 +87,16 @@ bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::map<int
  * @param[in] fd			File descriptor of the client affected
  * @param[in,out] clients	Map with the clients
  * 
- * @return true if a connection has been closed, false otherwise
+ * @return A pair of items: the first one is a bool that indicates if the connection
+ * 			has to be closed; the second one is a pointer to a CGIClient, if one is created
 */
-bool	handle_clients_request( int fd, std::map<int, Client>& clients )
+static std::pair<bool, CGIClient*>	handle_clients_request( int fd, std::map<int, Client>& clients )
 {
 	std::string response;
 	std::map<int, Client>::iterator client_it = clients.find(fd);
 
 	if (client_it == clients.end())
-		return false;
+		return std::pair<bool, CGIClient*>(false, NULL);
 	std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd << std::endl;
 
 	/* NOTE: Save all the request */
@@ -84,7 +110,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	/* If the request is not finished or is a close connection, do some things */
 	request->process_request( fd );
 	if (!request->check_finished())
-		return false;
+		return std::pair<bool, CGIClient*>(false, NULL);
 
 	if (request->check_closed())
 	{
@@ -92,7 +118,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		std::cout <<std::endl << RED"[ CLOSED CONNECTION ]" << RESET << " The connection with " << fd << " has been closed" << std::endl;
 		clients.erase(client_it);
 		close(fd);
-		return true;
+		return std::pair<bool, CGIClient*>(true, NULL);
 	}
 
 	/* NOTE: Validate the request */
@@ -109,7 +135,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 		/* Return false */
 		delete request;
 		client_it->second.set_request(NULL);
-		return false;
+		return std::pair<bool, CGIClient*>(false, NULL);;
 	}
 
 	/* Error_page case */
@@ -136,7 +162,7 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 
 		delete request;
 		client_it->second.set_request(NULL);
-		return false;
+		return std::pair<bool, CGIClient*>(false, NULL);
 	}
 	
 	/* NOTE: Get the full path */
@@ -158,45 +184,131 @@ bool	handle_clients_request( int fd, std::map<int, Client>& clients )
 	else {
 		/* Get path without route to insert alias */
 		std::string path = request->get_path().replace( 0 , route.size(), ""  );
-		
-		/* Create full path */
-		full_path = root + (( alias[ alias.size() - 1 ] == '/') ? alias : (alias  + "/") ) + path;
-		
+	
+		if ( alias[ alias.size() - 1 ] == '/' ) {
+			if ( !path.empty() && path[0] == '/' ) /* Case alias has end "/" and path has end "/" */
+				full_path = root + alias + path.substr( 1, path.size() - 1 );
+			else	/* Case alias has end "/" and path has no start "/" */
+				full_path = root + alias + path;
+		} else if ( !path.empty() && path[0] == '/' ) { /* Case alias has no end "/" and path starts with "/" */
+			full_path = root + alias + path;
+		} else	/* Case alias has no end "/" and path starts with no "/"  */
+			full_path = root + alias + "/" + path;
+
 		/* remove last "/" */
 		full_path = (full_path.at( full_path.size() - 1 ) == '/' ) ? full_path.substr( 0, full_path.size() - 1 ) : full_path;
 	}
 
 	/* NOTE: Check the method and call a function */
+	CGIClient	*cgiclient = NULL;
 	if (request->get_method() == "GET")
 		get_method( full_path, client_it->second, request );
 	else if (request->get_method() == "POST")
-		post_method( full_path, client_it->second, request );
+		cgiclient = post_method( full_path, client_it->second, request );
 	else /* DELETE */
 		delete_method( full_path, client_it->second, request );
-	
-	/* DEBUGGING: Form examples */
-	// std::string response2;
-	// response2 =
-	// 	"HTTP/1.1 200 OK\r\n"
-	// 	"Content-Type: text/html\r\n"
-	// 	"Connection: keep-alive\r\n"
-	// 	"Set-Cookie: " + client_it->second.get_cookie() + "\r\n"
-		/* DEBUGGING: CGI*/
-	// 	"Content-Length: 179\r\n"
-	// 	"\r\n"
-	// 	"<form action=\"/\" method=\"POST\"><label for=\"mensaje\">Mensaje:</label><input type=\"text\" id=\"mensaje\" name=\"mensaje\" required><button type=\"submit\">Enviar</button></form>";
-		/* DEBUGGING: Files*/
-	// "Content-Length: 210\r\n"
-	// 	"\r\n"
-	// "<form action=\"/\" method=\"POST\" enctype=\"multipart/form-data\"><input type=\"text\" name=\"username\" placeholder=\"Enter your name\"><input type=\"file\" name=\"uploaded_file\"><button type=\"submit\">Upload</button></form>";
-
-
-	// send(fd, response2.c_str(), response2.size(), 0);
 
 	/* Delete the request data */
-	delete request;
 	client_it->second.set_request(NULL);
-	return false;
+	if (!cgiclient)
+		delete request;
+	return std::pair<bool, CGIClient*>(false, cgiclient);
+}
+
+/**
+ * @brief	Function to manage the CGI actions
+ * 
+ * @param	fd File descriptor to check
+ * @param	cgis Map with all the cgis data
+ * @param	read_data Boolean to take into a count the read of the data or not
+ * 
+ * @return	Boolean that indicates if the element has to be removed or not
+ */
+static bool	handle_cgi( int fd, std::map<int, CGIClient*>& cgis, bool read_data )
+{
+	/* NOTE: Check if the fd is from a CGI */
+	std::map<int, CGIClient*>::iterator cgi_it = cgis.find( fd );
+	if ( cgi_it == cgis.end() )
+		return false;
+	CGIClient* current_cgi = cgi_it->second;
+
+	/* NOTE: Check the timeout */
+	if (current_cgi->has_timeout())
+	{
+		/* Close the process */
+		kill(current_cgi->get_pid(), SIGTERM);
+		if (waitpid(current_cgi->get_pid(), NULL, WNOHANG) == 0)
+		{
+			kill(current_cgi->get_pid(), SIGKILL);
+			waitpid(current_cgi->get_pid(), NULL, WNOHANG);
+		}
+
+		/* Return a 504 */
+		error_send( current_cgi->get_client(), 504, current_cgi->get_location()->get_error_page(504), current_cgi->get_request() );
+		return true;
+	}
+
+	if (!read_data)
+		return false;
+
+	/* Read the buffer data */
+	char buffer[1025];
+	int bytes_recieved;
+	do
+	{
+		bytes_recieved = read( current_cgi->get_pipe_fd(), buffer, 1024 );
+		if (bytes_recieved > 0)
+		{
+			buffer[bytes_recieved] = '\0';
+			current_cgi->add_data(buffer);
+		}
+	} while (bytes_recieved > 0);
+	
+	/* Check if the process finished */
+	int status;
+	int result = waitpid( current_cgi->get_pid(), &status, WNOHANG );
+	if (result <= 0)
+		return false;
+	
+	/* NOTE: Prepare the response, taking into account the status (child exit) value */
+	if (WEXITSTATUS(status) == 0)
+	{
+		std::string response = HTTPResponse::get_cgi_data_response( current_cgi->get_data(), current_cgi->get_client().get_cookie());
+		send( current_cgi->get_client().get_fd(), response.c_str(),response.size(), MSG_NOSIGNAL);
+	}
+	else
+	{
+		/* Error */
+		error_send(current_cgi->get_client(), 500, current_cgi->get_location()->get_error_page(500), current_cgi->get_request());
+	}
+
+	return true;
+}
+
+/**
+ * @brief Function that handles the poll timeout
+ * 
+ * @param	fds Vector with all the fds
+ * @param	cgis Map wit the client CGI objects
+ */
+static void	handle_poll_timeout( std::vector<pollfd>& fds, std::map<int, CGIClient*>& cgis )
+{
+	/* NOTE: Check the cgis */
+	bool	changes;
+	do
+	{
+		changes = false;
+		for(std::map<int, CGIClient*>::iterator it = cgis.begin(); it != cgis.end(); it++)
+		{
+			if (handle_cgi( it->first, cgis, false ))
+			{
+				changes = true;
+				remove_cgiclients( it->first, fds, cgis );
+				break ;
+			}
+		}
+	} while(changes);
+
 }
 
 void	process_requests(std::vector<Server> servers_vector)
@@ -204,10 +316,12 @@ void	process_requests(std::vector<Server> servers_vector)
 	/* Storage variables */
 	std::map<int, Server> servers;
 	std::map<int, Client> clients;
+	std::map<int, CGIClient*> cgis;
     std::vector<pollfd> pollfds;
 
 	/* NOTE: Init the maps */
 	clients.clear();
+	cgis.clear();
 	servers.clear();
 	for (std::vector<Server>::iterator servers_it = servers_vector.begin(); servers_it != servers_vector.end(); servers_it++)
 	{
@@ -231,36 +345,82 @@ void	process_requests(std::vector<Server> servers_vector)
 	int res;
 	while (!sigint_signal)
 	{
-		std::cout << CYAN << "\n[ POLL ]" << RESET << " Waiting for changes...\n\t- Servers: " << servers.size() << "\n\t- Clients: " << clients.size() << std::endl;
-		res = poll(&pollfds[0], pollfds.size(), -1);
+		std::cout << CYAN << "\n[ POLL ]" << RESET << " Waiting for changes... (" << pollfds.size() << ")\n\t- Servers: " << servers.size() << "\n\t- Clients: " << clients.size() << "\n\t- CGIs: " << cgis.size() << std::endl;
+		res = poll(&pollfds[0], pollfds.size(), POLL_TIMEOUT);
 		if (res < 0)
 		{
 			if (!sigint_signal)
 				std::cout << "Error on the poll function" << std::endl;
 			break ;
 		}
-		/* TODO: Check if timeout happens -> CGI */
+		
+		if (res == 0)
+		{
+			handle_poll_timeout( pollfds, cgis );
+			continue ;
+		}
 
 		/* Check what fd has changed */
 		for (std::vector<pollfd>::iterator it = pollfds.begin(); it != pollfds.end(); it++)
 		{
 			/* Check if the current fd hsa been modified */
-			if ((*it).revents & POLLIN)
+			if (it->revents & POLLIN || it->revents & POLLHUP)
 			{
+				/* Handle CGI */
+				if (handle_cgi( (*it).fd, cgis, true ))
+				{
+					remove_cgiclients( (*it).fd, pollfds, cgis );
+					break ;
+				}
+
 				/* Handle the client requests */
-				if (handle_clients_request( (*it).fd, clients ))
+				std::pair<bool, CGIClient*> connection_data = handle_clients_request( (*it).fd, clients );
+				if (connection_data.first)
 				{
 					pollfds.erase(it);
+					break ;
+				}
+
+				if (connection_data.second)
+				{
+					cgis.insert(std::pair<int, CGIClient*>( connection_data.second->get_pipe_fd(), connection_data.second ));
+					pollfd current_pollfd;
+					current_pollfd.fd = connection_data.second->get_pipe_fd();
+					current_pollfd.events = POLLIN | POLLHUP;
+					pollfds.push_back(current_pollfd);
 					break ;
 				}
 
 				/* Handle the new connections */
 				if (handle_new_connection((*it).fd, servers, clients, pollfds))
 					break ;
-				/* TODO: handle CGI */
 			}
 		}
 	}
+
+	/* Close the actives cgis */
+	bool changes;
+	do
+	{
+		changes = false;
+		for (std::map<int, CGIClient*>::iterator it = cgis.begin(); it != cgis.end(); it++)
+		{
+			CGIClient* current_cgi = it->second;
+
+			/* Close the process */
+			kill(current_cgi->get_pid(), SIGTERM);
+			if (waitpid(current_cgi->get_pid(), NULL, WNOHANG) == 0)
+			{
+				kill(current_cgi->get_pid(), SIGKILL);
+				waitpid(current_cgi->get_pid(), NULL, WNOHANG);
+			}
+
+			/* Return a 504 */
+			error_send( current_cgi->get_client(), 504, current_cgi->get_location()->get_error_page(504), current_cgi->get_request() );
+			remove_cgiclients( it->first, pollfds, cgis );
+			break ;
+		}
+	} while (changes);
 
 	/* NOTE: Close the client fds, sending a close response */
 	std::string response;
@@ -270,5 +430,5 @@ void	process_requests(std::vector<Server> servers_vector)
 		send(it->first, response.c_str(), response.size(), MSG_NOSIGNAL);
 		close(it->first);
 	}
-	/* TODO: Close the CGIs pipes */
+	
 }

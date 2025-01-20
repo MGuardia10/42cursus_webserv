@@ -22,7 +22,6 @@
 /* Limit for client_max_body_size - 50mb */
 # define MAX_BODY_SIZE_BYTES			52428800
 
-
 /* Server protocol */
 # define SERVER_PROTOCOL				"HTML/1.1"
 
@@ -35,3 +34,13 @@
 
 /* Extensions path */
 # define EXTENSIONS_PATH "src/HTTPRequestResponse/extensions.csv"
+
+/******************/
+/* NOTE: Timeouts */
+/******************/
+
+/* Poll timeout (miliseconds)*/
+# define POLL_TIMEOUT 1000 // 1 second
+
+/* CGI timeout (seconds) */
+# define CGI_TIMEOUT 5
