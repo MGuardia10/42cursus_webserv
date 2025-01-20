@@ -184,10 +184,17 @@ static std::pair<bool, CGIClient*>	handle_clients_request( int fd, std::map<int,
 	else {
 		/* Get path without route to insert alias */
 		std::string path = request->get_path().replace( 0 , route.size(), ""  );
-		
-		/* Create full path */
-		full_path = root + (( alias[ alias.size() - 1 ] == '/') ? alias : (alias  + "/") ) + path;
-		
+	
+		if ( alias[ alias.size() - 1 ] == '/' ) {
+			if ( !path.empty() && path[0] == '/' ) /* Case alias has end "/" and path has end "/" */
+				full_path = root + alias + path.substr( 1, path.size() - 1 );
+			else	/* Case alias has end "/" and path has no start "/" */
+				full_path = root + alias + path;
+		} else if ( !path.empty() && path[0] == '/' ) { /* Case alias has no end "/" and path starts with "/" */
+			full_path = root + alias + path;
+		} else	/* Case alias has no end "/" and path starts with no "/"  */
+			full_path = root + alias + "/" + path;
+
 		/* remove last "/" */
 		full_path = (full_path.at( full_path.size() - 1 ) == '/' ) ? full_path.substr( 0, full_path.size() - 1 ) : full_path;
 	}

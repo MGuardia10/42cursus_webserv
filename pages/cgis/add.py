@@ -8,6 +8,6 @@ if __name__ == '__main__':
 	n1 = int(line[0].split("=")[1])
 	n2 = int(line[1].split("=")[1])
 
-	print(f"Result: {n1 + n2}")
+	print(f"La suma es: {n1 + n2}")
 
 	sys.exit(0)
