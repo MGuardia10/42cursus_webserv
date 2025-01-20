@@ -125,4 +125,14 @@ class HTTPResponse
 		 * @return The correct response
 		 */
 		static std::string	get_autoindex_response( std::string path, std::string request_path, std::string cookie );
+
+		/**
+		 * @brief Function to generate a response with a cgi data
+		 * 
+		 * @param	data Data to put on the response
+		 * @param	cookie Cookie of the client
+		 * 
+		 * @return The generated response
+		 */
+		static std::string	get_cgi_data_response( std::string data, std::string cookie );
 };

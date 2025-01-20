@@ -7,11 +7,13 @@
 /* SECTION:               Constructors and destructor                         */
 /*============================================================================*/
 
-CGIClient::CGIClient( Client const& client, pid_t pid, int pipe_fd, HTTPRequest *request ) :
+CGIClient::CGIClient( Client& client, Location* location, pid_t pid, int pipe_fd, HTTPRequest* request ) :
 	_client(client),
+	_location(location),
 	_pid(pid),
 	_pipe_fd(pipe_fd),
-	_request(request)
+	_request(request),
+	_data("")
 {
 	_start_time = time(NULL);
 }
@@ -70,11 +72,15 @@ std::ostream&	operator<<( std::ostream& os, CGIClient const& printObject )
 /* SECTION:                    Getters and setters                            */
 /*============================================================================*/
 
-Client const&	CGIClient::get_client( void ) const { return _client; }
+Client&			CGIClient::get_client( void ) const { return _client; }
+Location*		CGIClient::get_location( void ) const { return _location; }
 pid_t			CGIClient::get_pid( void ) const { return _pid; }
 int				CGIClient::get_pipe_fd( void ) const { return _pipe_fd; }
 time_t			CGIClient::get_start_time( void ) const { return _start_time; }
 HTTPRequest*	CGIClient::get_request( void ) const { return _request; }
+
+std::string		CGIClient::get_data( void ) const { return _data; }
+void			CGIClient::add_data( std::string data ) { _data += data; }
 
 /*==========*/
 /* !SECTION */
