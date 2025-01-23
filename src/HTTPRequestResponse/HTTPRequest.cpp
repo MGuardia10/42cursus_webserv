@@ -335,9 +335,9 @@ void	HTTPRequest::process_request( int fd )
 			move_body_file("/tmp/" + _request_filename);
 
 		/* Check if the connection is closed by the header */
-		std::map<std::string, std::string>::iterator map_it = _headers.find("Connection");
-		if (map_it != _headers.end() && map_it->second == "close")
-			_is_closed = true;
+		// std::map<std::string, std::string>::iterator map_it = _headers.find("Connection");
+		// if (map_it != _headers.end() && map_it->second == "close")
+		// 	_is_closed = true;
 	}
 }
 
