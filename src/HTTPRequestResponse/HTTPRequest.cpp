@@ -8,8 +8,7 @@
 
 # define HTTP_DELIMITIER "\r\n"
 # define BUFFER_SIZE 1025
-// # define FILENAME_TAG	"name"
-# define FILENAME_TAG	"filename"
+# define FILENAME_TAG	"filename" // or "name"
 
 
 /*============================================================================*/
@@ -235,7 +234,7 @@ void	HTTPRequest::process_request( int fd )
 		if (!_body_started)
 		{
 			_request.append(buffer, bytes_received);
-			headers_size = _request.find("\r\n\r\n");
+			headers_size = _request.find(std::string(HTTP_DELIMITIER) + HTTP_DELIMITIER);
 			if (headers_size == std::string::npos)
 				continue ;
 			_body_started = true;
@@ -277,7 +276,7 @@ void	HTTPRequest::process_request( int fd )
 			{
 				/* Search of the boundaries */
 				body_string = std::string(&_body[0], _body.size());
-				size_t boundary_index = body_string.find(_boundary + "\r\n");
+				size_t boundary_index = body_string.find(_boundary + HTTP_DELIMITIER);
 				size_t	next_boundary = 0;
 				while (boundary_index != std::string::npos && next_boundary != std::string::npos)
 				{
@@ -286,13 +285,13 @@ void	HTTPRequest::process_request( int fd )
 					_body.erase(_body.begin(), _body.begin() + boundary_index);
 					body_string = std::string(&_body[0], _body.size());
 
-					next_boundary = body_string.find(_boundary + "\r\n", 1);
+					next_boundary = body_string.find(_boundary + HTTP_DELIMITIER, 1);
 					if (next_boundary != std::string::npos)
 						boundary_index = next_boundary;
 				}
 
 				/* The string should now start with the last boundary and, therefore, the content-disposition with the name to put */
-				/* Search of FILENAME_TAG, get the value, and erase all until \r\n */
+				/* Search of FILENAME_TAG, get the value, and erase all until HTTP_DELIMITIER */
 				if (_request_filename == "")
 				{
 					size_t tag_index = body_string.find(FILENAME_TAG);
@@ -306,7 +305,7 @@ void	HTTPRequest::process_request( int fd )
 					
 					size_t start_tag = tag_index + std::string(FILENAME_TAG).size() + 2;
 					_request_filename = body_string.substr(start_tag, end_tag_index - start_tag);
-					size_t	end_body_headers = body_string.find("\r\n\r\n", end_tag_index);
+					size_t	end_body_headers = body_string.find(std::string(HTTP_DELIMITIER) + HTTP_DELIMITIER, end_tag_index);
 					_content_length -= (end_body_headers + 4);
 					_body.erase(_body.begin(), _body.begin() + end_body_headers + 4);
 				}
