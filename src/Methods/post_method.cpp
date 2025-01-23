@@ -76,7 +76,15 @@ static CGIClient*	post_cgi( std::string path, std::string cgi_path, Client& clie
 		/* Redirecciones */
 		int infile = open(request->get_filename().c_str(), O_RDONLY);
 		dup2(infile, STDIN_FILENO);
+		close(infile);
 		dup2(pipes[1], STDOUT_FILENO);
+
+		int	dev_null = open("/dev/null", O_WRONLY);
+		if (dev_null > 0)
+		{
+			dup2(dev_null, STDERR_FILENO);
+			close(dev_null);
+		}
 
 		/* Ejecucion */
 		execve(cgi_path.c_str(), args, environ);
@@ -105,6 +113,5 @@ CGIClient*	post_method( std::string path, Client& client, HTTPRequest* request)
 	else
 		cgiclient = post_cgi( path, cgi_found, client, request, location.second );
 
-	std::cout << "path [" << path << "]" << '\n';
 	return cgiclient;
 }

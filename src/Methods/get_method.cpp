@@ -31,8 +31,6 @@ void	get_method( std::string path, Client& client, HTTPRequest* request)
 	struct stat file_data;
 	std::pair<bool, const Location *> location = client.get_server().get_location( request->get_path() );
 
-	std::cout << "path [" << path << "]" << '\n';
-
 	/* NOTE: 1. Check if the item exists and has lecture mode; otherwise, return a 404 (Not Found) or 403 (forbidden) response */
 	std::pair<bool, bool> file_status = check_mode( path, &file_data, S_IRUSR );
 	if (!file_status.first)

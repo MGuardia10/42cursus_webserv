@@ -4,6 +4,9 @@
 /* NOTE: Server/location/configbase inits */
 /******************************************/
 
+/* Max. number of connections to a server simultaneously */
+# define SERVERS_BACKLOG	10
+
 /* Default max size of a HTTP request -> 100 bytes/characters */
 # define CLIENT_MAX_BODY_SIZE_DEFAULT	100
 
@@ -44,3 +47,11 @@
 
 /* CGI timeout (seconds) */
 # define CGI_TIMEOUT 5
+
+/***************/
+/* NOTE: Debug */
+/***************/
+
+#ifndef DEBUG
+# define DEBUG false
+#endif

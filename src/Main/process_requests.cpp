@@ -59,7 +59,8 @@ static bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::
 
 	/* New connection */
 	int new_connection = accept(fd, NULL, NULL);
-	std::cout << GREEN << "[ NEW CONNECTION ]" << RESET << " New client: " << new_connection << std::endl;
+	if (DEBUG)
+		std::cout << GREEN << "[ NEW CONNECTION ]" << RESET << " New client: " << new_connection << std::endl;
 
 	/* Make the connection non blocking */
 	int flags = fcntl(new_connection, F_GETFL, 0);
@@ -67,7 +68,8 @@ static bool	handle_new_connection( int fd, std::map<int, Server>& servers, std::
 
 	/* Creation of the client to save the info */
 	Client new_client = Client(new_connection, server_it->second);
-	std::cout << new_client << std::endl;
+	if (DEBUG)
+		std::cout << new_client << std::endl;
 	clients.insert(std::pair<int, Client>(new_connection, new_client));
 
 	/* Add the fd to the pollfd list */
@@ -97,7 +99,8 @@ static std::pair<bool, CGIClient*>	handle_clients_request( int fd, std::map<int,
 
 	if (client_it == clients.end())
 		return std::pair<bool, CGIClient*>(false, NULL);
-	std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd << std::endl;
+	if (DEBUG)
+		std::cout << YELLOW << "[ NEW REQUEST ]" << RESET << " New request by " << fd << std::endl;
 
 	/* NOTE: Save all the request */
 	HTTPRequest*	request = client_it->second.get_request();
@@ -115,7 +118,8 @@ static std::pair<bool, CGIClient*>	handle_clients_request( int fd, std::map<int,
 	if (request->check_closed())
 	{
 		delete request;
-		std::cout <<std::endl << RED"[ CLOSED CONNECTION ]" << RESET << " The connection with " << fd << " has been closed" << std::endl;
+		if (DEBUG)
+			std::cout <<std::endl << RED"[ CLOSED CONNECTION ]" << RESET << " The connection with " << fd << " has been closed" << std::endl;
 		clients.erase(client_it);
 		close(fd);
 		return std::pair<bool, CGIClient*>(true, NULL);
@@ -271,6 +275,8 @@ static bool	handle_cgi( int fd, std::map<int, CGIClient*>& cgis, bool read_data 
 		return false;
 	
 	/* NOTE: Prepare the response, taking into account the status (child exit) value */
+	if (DEBUG)
+		std::cout << GRAY << "[ CGI ]" << RESET << " Finished with status " << result << std::endl;
 	if (WEXITSTATUS(status) == 0)
 	{
 		std::string response = HTTPResponse::get_cgi_data_response( current_cgi->get_data(), current_cgi->get_client().get_cookie());
@@ -345,7 +351,8 @@ void	process_requests(std::vector<Server> servers_vector)
 	int res;
 	while (!sigint_signal)
 	{
-		std::cout << CYAN << "\n[ POLL ]" << RESET << " Waiting for changes... (" << pollfds.size() << ")\n\t- Servers: " << servers.size() << "\n\t- Clients: " << clients.size() << "\n\t- CGIs: " << cgis.size() << std::endl;
+		if (DEBUG)
+			std::cout << CYAN << "\n[ POLL ]" << RESET << " Waiting for changes... (" << pollfds.size() << ")\n\t- Servers: " << servers.size() << "\n\t- Clients: " << clients.size() << "\n\t- CGIs: " << cgis.size() << std::endl;
 		res = poll(&pollfds[0], pollfds.size(), POLL_TIMEOUT);
 		if (res < 0)
 		{

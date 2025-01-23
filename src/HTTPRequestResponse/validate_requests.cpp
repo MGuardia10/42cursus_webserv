@@ -26,9 +26,6 @@ std::string build_error_page_path( const ConfigBase& item, int code ) {
 		}
     }
 
-	/* DEBUG: path to error_page */
-	std::cout << "PATH ERROR: {" << path << "}\n";
-
 	/* Return complete path to error file */
 	return path;
 }

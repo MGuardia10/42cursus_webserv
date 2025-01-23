@@ -10,6 +10,7 @@ COLOR_RESET		= \e[0m
 #####################################################################################################################
 CXX			:= c++
 CXXFLAGS	:= -Wall -Wextra -Werror -std=c++98 -g3 -fdiagnostics-color=always
+DEBUG_MODE	:= -DDEBUG=true
 #####################################################################################################################
 # Paths to find the files
 VPATH =	include/:		\
@@ -87,11 +88,11 @@ $(OBJ_FOLDER)/%.o: %.cpp $(HEADERS)
 
 	@if [ ! -e $(OBJ_FOLDER)/.cpp ]; then			\
 		touch $(OBJ_FOLDER)/.cpp;					\
-		echo "$(COLOR_BLUE)[ C++ ] Compiling c++ files ($(COLOR_CYAN)$(CXXFLAGS)$(COLOR_BLUE))$(COLOR_RESET)";		\
+		echo "$(COLOR_BLUE)[ C++ ] Compiling c++ files ($(COLOR_CYAN)$(CXXFLAGS) $(DEBUG_MODE)$(COLOR_BLUE))$(COLOR_RESET)";		\
 	fi
 
 	@echo -n "\t$(COLOR_CYAN)[......]  Compiling $<...$(COLOR_RESET)"
-	@RES=$$($(CXX) $(CXXFLAGS) -c $< -o $@ 2> $(OBJ_FOLDER)/.error; echo $$?);	\
+	@RES=$$($(CXX) $(CXXFLAGS) $(DEBUG_MODE) -c $< -o $@ 2> $(OBJ_FOLDER)/.error; echo $$?);	\
 	if [ $$RES -ne 0 ]; then													\
 		echo "\r\t$(COLOR_RED)[ ERROR ]$(COLOR_RESET)";							\
 		tail -n +1 $(OBJ_FOLDER)/.error;										\
@@ -106,6 +107,15 @@ $(OBJ_FOLDER)/%.o: %.cpp $(HEADERS)
 CLEAN_EXTENSION:
 	@rm -rf $(OBJ_FOLDER)/.cpp $(OBJ_FOLDER)/.error
 
+#####################################################################################################################
+
+nd: no_debug
+no_debug: DEBUG_MODE=-DDEBUG=false
+no_debug: re v
+
+s: siege
+siege:
+	@siege -t10s -c10 -b http://localhost:8080
 
 #####################################################################################################################
 
@@ -153,4 +163,4 @@ valgrind: run
 #####################################################################################################################
 
 # Rules that won't be treated as files
-.PHONY: all clean fclean re r run v valgrind
+.PHONY: all CLEAN_EXTENSION nd no_debug s siege clean fclean re r run v valgrind
