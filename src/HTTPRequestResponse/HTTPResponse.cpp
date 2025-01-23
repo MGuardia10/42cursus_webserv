@@ -196,7 +196,7 @@ std::map<std::string, std::string>	HTTPResponse::get_default_headers( int code, 
 }
 
 /** Function to generate a general response, with a specified code and msg */
-std::string HTTPResponse::get_response_template( int code, std::string msg, std::string cookie )
+std::string HTTPResponse::get_response_template( int code, std::string msg, std::string cookie, std::vector<std::string> methods )
 {
 	std::map<std::string, std::string> header;
 	std::string	body;
@@ -224,6 +224,17 @@ std::string HTTPResponse::get_response_template( int code, std::string msg, std:
 	header["Content-Length"] = ss.str();
 	extension_it = _extensions.find("html");
 	header["Content-Type"] = (extension_it == _extensions.end() ? "text/html" : extension_it->second);
+	if (!methods.empty())
+	{
+		std::string methods_string = "";
+		for (std::vector<std::string>::iterator it = methods.begin(); it != methods.end(); it++)
+		{
+			if (methods_string != "")
+				methods_string  += ", ";
+			methods_string += *it;
+		}
+		header["Allow"] = methods_string;
+	}
 
 	/* Put everything together */
 	return headers_map_to_string(header) + body;
@@ -241,7 +252,7 @@ std::string	HTTPResponse::get_close_connection_template( std::string cookie )
 }
 
 /** Function to return the data of a file */
-std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std::string path, std::string cookie, long long offset )
+std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std::string path, std::string cookie, long long offset, std::vector<std::string> methods )
 {
 	std::map<std::string, std::string> header;
 	std::string body, response;
@@ -276,6 +287,18 @@ std::pair<long long, std::string>	HTTPResponse::get_file_response( int code, std
 		if (index != std::string::npos)
 			 it = _extensions.find(path.substr(index + 1, path.size()));
 		header["Content-Type"] = (index != std::string::npos && it != _extensions.end() ? it->second : "text/plain");
+
+		if (!methods.empty())
+		{
+			std::string methods_string = "";
+			for (std::vector<std::string>::iterator it = methods.begin(); it != methods.end(); it++)
+			{
+				if (methods_string != "")
+					methods_string  += ", ";
+				methods_string += *it;
+			}
+			header["Allow"] = methods_string;
+		}
 	}
 
 	/* Read and write on the buffer */
@@ -314,20 +337,21 @@ std::string	HTTPResponse::get_return_response( ConfigBase::ReturnData* data, std
 }
 
 /** Function to return an error page */
-std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int code, std::string path, std::string cookie, long long offset )
+std::pair<long long, std::string>	HTTPResponse::get_error_page_response( int code, std::string path, std::string cookie, long long offset, std::vector<std::string> methods )
 {
+	(void)methods;
 	std::pair<long long, std::string> file_response;
 	std::string	response;
 	long long new_offset;
 
 	/* Read the file; if an error is detected, */
 	if (path != "")
-		file_response = get_file_response( code, path, cookie, offset );
+		file_response = get_file_response( code, path, cookie, offset, methods );
 
 	if (path == "" || file_response.first < 0)
 	{
 		new_offset = 0;
-		response = get_response_template( code, "", cookie );
+		response = get_response_template( code, "", cookie, methods );
 	}
 	else
 	{

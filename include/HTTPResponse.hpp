@@ -47,7 +47,7 @@ class HTTPResponse
 		 * 
 		 * @return A correct response that can be sent
 		 */
-		static std::string	get_response_template( int code, std::string msg, std::string cookie );
+		static std::string	get_response_template( int code, std::string msg, std::string cookie, std::vector<std::string> methods=std::vector<std::string>() );
 
 	protected:
 	public:
@@ -90,7 +90,7 @@ class HTTPResponse
 		 * 			the response returned is the last one; the second field is the response to sent.
 		 * 			If the first value is negative, an error ocurred
 		 */
-		static std::pair<long long, std::string>	get_file_response( int code, std::string path, std::string cookie, long long offset );
+		static std::pair<long long, std::string>	get_file_response( int code, std::string path, std::string cookie, long long offset, std::vector<std::string> methods=std::vector<std::string>() );
 
 		/**
 		 * @brief Function to generate the response of a return statement
@@ -109,12 +109,13 @@ class HTTPResponse
 		 * @param	path Path where the error page is saved. If path is empty (""), a default page
 		 * 					is generated
 		 * @param	cookie Cookie of the client
-		 * @param	offset index of the last bytes sent; used if the page is too long
+		 * @param	offset Index of the last bytes sent; used if the page is too long
+		 * @param	methods Methods to add on the header
 		 * 
 		 * @return	On the first field, the index of the last byte sent: if it is 0, the file has been
 		 * 				read; on the second field, the current response is formed
 		 */
-		static std::pair<long long, std::string>	get_error_page_response( int code, std::string path, std::string cookie, long long offset );
+		static std::pair<long long, std::string>	get_error_page_response( int code, std::string path, std::string cookie, long long offset, std::vector<std::string> methods=std::vector<std::string>() );
 
 		/**
 		 * @brief Function to generate the autoindex of a specific path
