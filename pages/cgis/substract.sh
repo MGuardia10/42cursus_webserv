@@ -11,4 +11,4 @@ num2=$(echo "$input" | sed -E 's/.*&.*=([-+]?[0-9]+)/\1/')
 result=$((num1 - num2))
 
 # Mostrar el resultado
-echo "La resta es: $result"
+echo "The subtraction is: $result"
