@@ -28,8 +28,6 @@ class Server : public ConfigBase
 		/* List of the server locations */
 		std::map<std::string, Location>	_locations;
 
-		static int const BACKLOG = 10;
-
 	public:
 
 		/* NOTE: Constructors and destructor */

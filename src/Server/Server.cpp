@@ -228,7 +228,7 @@ void	Server::run( void )
 		}
 
 		/* Active the listen */
-		if (listen(socket_fd, BACKLOG) == -1)
+		if (listen(socket_fd, SERVERS_BACKLOG) == -1)
 		{
 			close(socket_fd);
 			throw ServerException("Error while starting the listen", strerror(errno));
