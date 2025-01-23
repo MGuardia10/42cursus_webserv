@@ -113,6 +113,10 @@ nd: no_debug
 no_debug: DEBUG_MODE=-DDEBUG=false
 no_debug: re v
 
+s: siege
+siege:
+	@siege -t10s -c10 -b http://localhost:8080
+
 #####################################################################################################################
 
 # Standard clean rule
@@ -159,4 +163,4 @@ valgrind: run
 #####################################################################################################################
 
 # Rules that won't be treated as files
-.PHONY: all clean fclean re r run v valgrind
+.PHONY: all CLEAN_EXTENSION nd no_debug s siege clean fclean re r run v valgrind
