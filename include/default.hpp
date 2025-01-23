@@ -44,3 +44,11 @@
 
 /* CGI timeout (seconds) */
 # define CGI_TIMEOUT 5
+
+/***************/
+/* NOTE: Debug */
+/***************/
+
+#ifndef DEBUG
+# define DEBUG false
+#endif
