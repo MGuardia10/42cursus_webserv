@@ -105,6 +105,5 @@ CGIClient*	post_method( std::string path, Client& client, HTTPRequest* request)
 	else
 		cgiclient = post_cgi( path, cgi_found, client, request, location.second );
 
-	std::cout << "path [" << path << "]" << '\n';
 	return cgiclient;
 }
