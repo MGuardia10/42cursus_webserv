@@ -10,8 +10,9 @@ struct ErrorPageData {
 };
 
 struct RequestData {
-	ConfigBase::ReturnData	returnData;
-	ErrorPageData			errorData;
+	ConfigBase::ReturnData		returnData;
+	ErrorPageData				errorData;
+	std::vector<std::string>	methods;
 };
 
 RequestData	validate_request( Client& client, HTTPRequest* request );

@@ -148,7 +148,7 @@ static std::pair<bool, CGIClient*>	handle_clients_request( int fd, std::map<int,
 		{
 			/* Get error page */
 			std::pair<long long, std::string> data;
-			data = HTTPResponse::get_error_page_response( request_data.errorData.code, request_data.errorData.path, client_it->second.get_cookie(), offset );
+			data = HTTPResponse::get_error_page_response( request_data.errorData.code, request_data.errorData.path, client_it->second.get_cookie(), offset, request_data.methods );
 			
 			/* Update offset and response values */
 			offset = data.first;

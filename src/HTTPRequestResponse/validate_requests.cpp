@@ -42,6 +42,7 @@ RequestData	validate_request( Client& client, HTTPRequest* request ) {
 	request_data.errorData.path = "";
 	request_data.returnData.code = -1;
 	request_data.returnData.text = "";
+	request_data.methods.clear();
 
 	/* NOTE: 2. Check protocol is HTTP/1.1 */
 	if ( request->get_protocol().compare( "HTTP/1.1" ) != 0 ) {
@@ -104,6 +105,11 @@ RequestData	validate_request( Client& client, HTTPRequest* request ) {
 		
 		/* Set errorData code to 405 */
 		request_data.errorData.code = 405;
+
+		/* Set the methods on the vector */
+		std::vector<std::string> methods = location.second->get_methods();
+		for ( std::vector<std::string>::iterator it = methods.begin(); it != methods.end(); it++)
+			request_data.methods.push_back( *it );
 
 		/* Buscar si existe ruta para ese error */
 		request_data.errorData.path = build_error_page_path( *location.second, request_data.errorData.code );
