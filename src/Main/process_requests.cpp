@@ -111,12 +111,24 @@ static std::pair<bool, CGIClient*>	handle_clients_request( int fd, std::map<int,
 	}
 
 	/* If the request is not finished or is a close connection, do some things */
-	request->process_request( fd );
-	if (!request->check_finished())
+	bool error = false;
+	try
+	{
+		request->process_request( fd );
+	}
+	catch (HTTPRequest::HTTPRequestException& e)
+	{
+		error = true;
+	}
+
+	if (!error && !request->check_finished())
 		return std::pair<bool, CGIClient*>(false, NULL);
 
-	if (request->check_closed())
+	if (error || request->check_closed())
 	{
+		if (error)
+			error_send(client_it->second, 400, client_it->second.get_server().get_error_page(400), request);
+
 		delete request;
 		if (DEBUG)
 			std::cout <<std::endl << RED"[ CLOSED CONNECTION ]" << RESET << " The connection with " << fd << " has been closed" << std::endl;
