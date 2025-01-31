@@ -9,7 +9,7 @@ Webserv is a lightweight HTTP/1.1 server written in C++ that supports essential 
 - Basic session management via **cookies**
 - **Custom configuration** for defining virtual hosts, ports, and CGI settings
 
-To see a list of all the possible configurations supported by the project, check out the [WIKI](https://github.com/Luiz-Pastor/webserv/wiki/Configuration-File-and-Supported-Directives).
+To see a list of all the possible configurations supported by the project, check out the [WIKI](https://github.com/MGuardia10/42cursus_webserv/wiki/Configuration-File-and-Supported-Directives).
 
 ![LINUX](https://img.shields.io/badge/Linux-a?style=for-the-badge&logo=linux&color=grey)
 ![Docker](https://img.shields.io/badge/Docker-20232A?style=for-the-badge&logo=docker&color=b7e6ff)
