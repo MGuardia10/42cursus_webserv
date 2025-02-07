@@ -22,10 +22,10 @@ You can see the subject [**HERE.**](https://github.com/MGuardia10/42cursus/blob/
 
 1- Clone this repository
 	
-	git clone https://github.com/Luiz-Pastor/webserv.git
+	git clone https://github.com/MGuardia10/42cursus_webserv.git
 2- Navigate to the new directory and run `make`
 	
-	cd webserv
+	cd 42cursus_webserv
    	make
 3- Start the server, a config file is needed as an argument:
 
